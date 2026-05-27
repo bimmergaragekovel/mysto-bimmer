@@ -916,6 +916,18 @@ function applyData(data) {
   if (data.users)     state.users     = data.users || [];
 }
 
+// Часткові перезавантаження через один initData запит
+async function reloadData() {
+  const res = await api({ action: 'initData' });
+  if (res.ok) { applyData(res); saveCache(res); localStorage.removeItem('bg_cache_v2'); }
+  return res;
+}
+async function loadUsers()     { const r = await reloadData(); return r; }
+async function loadSuppliers() { const r = await reloadData(); return r; }
+async function loadParts()     { const r = await reloadData(); return r; }
+async function loadWorks()     { const r = await reloadData(); return r; }
+async function loadCodings()   { const r = await reloadData(); return r; }
+
 // ============================================================
 // INIT
 // ============================================================
@@ -3098,6 +3110,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-40</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-41</div>
 </body>
 </html>
