@@ -2971,12 +2971,71 @@ async function deleteWork(id) {
 
 function renderUsers() {
   document.getElementById('users-list').innerHTML = state.users.map(u => `
-    <div class="ut-row">
-      <span>${escapeHtml(u.login)}</span>
-      <span><span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(roleLabel(u.role))}</span></span>
-      <span style="color:var(--text3);font-size:12px">${escapeHtml(u.lastLogin || '—')}</span>
-      <button class="btn-d" onclick="deleteUser('${u.id}')">×</button>
+    <div class="ut-row" id="urow-${u.id}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="flex:1;min-width:0">
+          <span style="font-weight:700;font-size:13px">${escapeHtml(u.login)}</span>
+          <span class="role-badge role-${escapeHtml(u.role)}" style="margin-left:6px">${escapeHtml(roleLabel(u.role))}</span>
+        </div>
+        <span style="color:var(--text3);font-size:11px;white-space:nowrap">${escapeHtml(u.lastLogin||'—')}</span>
+        <button class="btn-d" style="padding:3px 8px;font-size:14px" title="Редагувати" onclick="toggleUserEdit('${u.id}')">✎</button>
+        <button class="btn-d" onclick="deleteUser('${u.id}')">×</button>
+      </div>
+      <div class="part-item-edit" id="uedit-${u.id}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="fl"><label>Логін / Імʼя</label>
+            <input type="text" id="uedit-login-${u.id}" value="${escapeHtml(u.login)}">
+          </div>
+          <div class="fl"><label>Роль</label>
+            <select id="uedit-role-${u.id}">
+              <option value="master"  ${u.role==='master' ?'selected':''}>Майстер</option>
+              <option value="viewer"  ${u.role==='viewer' ?'selected':''}>Перегляд</option>
+              <option value="admin"   ${u.role==='admin'  ?'selected':''}>Admin</option>
+            </select>
+          </div>
+          <div class="fl" style="grid-column:1/-1"><label>Новий пароль (залиш порожнім якщо не змінювати)</label>
+            <input type="password" id="uedit-pass-${u.id}" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="btn-p sm" style="width:100%" onclick="saveUserEdit('${u.id}')">Зберегти зміни</button>
+      </div>
     </div>`).join('');
+}
+
+function toggleUserEdit(id) {
+  const el = document.getElementById('uedit-' + id);
+  if (el) el.classList.toggle('open');
+}
+
+async function saveUserEdit(id) {
+  const login    = document.getElementById('uedit-login-' + id)?.value.trim();
+  const role     = document.getElementById('uedit-role-'  + id)?.value;
+  const password = document.getElementById('uedit-pass-'  + id)?.value;
+  if (!login) { toast('Логін не може бути порожнім', 'error'); return; }
+  const existing = state.users.find(u => u.id == id);
+  if (!existing) return;
+  showLoader();
+  const item = {
+    id:       existing.id,
+    login,
+    role,
+    password: password || existing.password || '',
+  };
+  const res = await api({ action: 'saveUser', item });
+  if (res.ok) {
+    await loadUsers(); renderUsers();
+    toast('Збережено', 'success');
+    // Оновлюємо список майстрів у формі ремонту
+    const masterSel = document.getElementById('f-master');
+    if (masterSel) {
+      const cur = masterSel.value;
+      const masters = state.users.filter(u => u.role === 'master' || u.role === 'admin');
+      masterSel.innerHTML = '<option value="">— не вказано —</option>' +
+        masters.map(u => `<option value="${escapeHtml(u.login)}">${escapeHtml(u.login)}</option>`).join('');
+      masterSel.value = cur;
+    }
+  } else toast(res.error || 'Помилка', 'error');
+  hideLoader();
 }
 
 async function addUser() {
@@ -3039,6 +3098,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-39</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-40</div>
 </body>
 </html>
