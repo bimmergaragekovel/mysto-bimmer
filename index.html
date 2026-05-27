@@ -546,6 +546,14 @@ a{color:inherit;text-decoration:none}
       <div class="stat-panel-title">Витрати запчастин за період</div>
       <div id="stat-parts"></div>
     </div>
+    <div class="stat-panel" style="margin-top:12px">
+      <div class="stat-panel-title" style="color:#e05050">Борги перед постачальниками</div>
+      <div id="stat-sup-debts"></div>
+    </div>
+    <div class="stat-panel" style="margin-top:12px">
+      <div class="stat-panel-title" style="color:#EF9F27">Зарплати майстрів (за період)</div>
+      <div id="stat-master-salaries"></div>
+    </div>
   </div>
 
   <!-- SETTINGS TAB -->
@@ -658,10 +666,16 @@ a{color:inherit;text-decoration:none}
         <div class="fl"><label>Клієнт</label><input type="text" id="f-client" placeholder="Прізвище ім'я"></div>
         <div class="fl"><label>Телефон</label><input type="tel" id="f-phone" placeholder="+380..."></div>
         <div class="fl"><label>Дата</label><input type="date" id="f-date"></div>
+        <div class="fl"><label>Дата завершення</label><input type="date" id="f-date-done"></div>
         <div class="fl"><label>Статус</label>
           <select id="f-status">
             <option value="open">Відкритий</option>
             <option value="done">Завершений</option>
+          </select>
+        </div>
+        <div class="fl"><label>Майстер</label>
+          <select id="f-master">
+            <option value="">— не вказано —</option>
           </select>
         </div>
         <div class="fl fw"><label>Нотатки</label><textarea id="f-notes" placeholder="Опис несправності, коментар майстра..."></textarea></div>
@@ -994,7 +1008,22 @@ function renderRepairs() {
     return;
   }
 
-  el.innerHTML = list.map(j => repairCard(j)).join('');
+  // Розділяємо і сортуємо
+  const open = list.filter(j => j.status !== 'done').sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const done = list.filter(j => j.status === 'done').sort((a,b) => (b.dateDone||b.date||'').localeCompare(a.dateDone||a.date||''));
+
+  let html = open.map(j => repairCard(j)).join('');
+
+  if (done.length) {
+    html += `<div style="display:flex;align-items:center;gap:10px;margin:16px 0 10px">
+      <div style="flex:1;height:1px;background:var(--border2)"></div>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);white-space:nowrap">Завершені · ${done.length}</span>
+      <div style="flex:1;height:1px;background:var(--border2)"></div>
+    </div>`;
+    html += done.map(j => repairCard(j)).join('');
+  }
+
+  el.innerHTML = html;
 }
 
 function supClass(name) {
@@ -1015,12 +1044,12 @@ function repairCard(j) {
   const worksTotal   = (j.works   || []).reduce((s, w) => s + (w.retail || 0), 0);
   const codingsTotal = (j.codings || []).reduce((s, c) => s + (c.retail || 0), 0);
   const margin    = partsTotal - costTotal;
-  const total     = worksTotal + codingsTotal + partsTotal;
+  const total     = Math.round(worksTotal + codingsTotal + partsTotal);
   const canEdit   = state.role !== 'viewer';
   const isAdmin   = state.role === 'admin';
   const paid      = (j.payments||[]).reduce((s,p) => s + (p.amount||0), 0);
-  const debt      = Math.round((j.total||0) - paid);
-  const payPct    = j.total > 0 ? Math.min(100, Math.round(paid / j.total * 100)) : 0;
+  const debt      = Math.round(total - paid);
+  const payPct    = total > 0 ? Math.min(100, Math.round(paid / total * 100)) : 0;
   const debtBadge = debt > 0 && paid > 0
     ? `<span class="debt-badge debt-part">Борг: ${debt.toLocaleString()} грн</span>`
     : debt > 0 && paid === 0
@@ -1105,6 +1134,8 @@ function repairCard(j) {
         ${''}
         ${j.client && j.date ? '<div class="divider"></div>' : ''}
         ${j.date ? `<span class="job-meta"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escapeHtml(j.date)}</span>` : ''}
+        ${j.dateDone ? `<span class="divider"></span><span class="job-meta" style="color:var(--green2)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(j.dateDone)}</span>` : ''}
+        ${j.master ? `<span class="divider"></span><span class="job-meta">👤 ${escapeHtml(j.master)}</span>` : ''}
         ${marginHtml}
       </div>
 
@@ -1155,7 +1186,7 @@ function repairCard(j) {
           <div class="pay-summary">
             <div class="pay-sum-item">
               <div class="pay-sum-label">Всього</div>
-              <div class="pay-sum-val" style="color:#fff">${(j.total||0).toLocaleString()}</div>
+              <div class="pay-sum-val" style="color:#fff">${total.toLocaleString()}</div>
             </div>
             <div class="pay-sum-item">
               <div class="pay-sum-label">Сплачено</div>
@@ -1250,15 +1281,20 @@ function toggleChip(el) {
 async function toggleRepairStatus(id) {
   const j = state.repairs.find(r => r.id == id);
   if (!j) return;
-  const updated = { ...j, status: j.status === 'open' ? 'done' : 'open' };
+  const becomingDone = j.status !== 'done';
+  const today = new Date().toISOString().split('T')[0];
+  const updated = {
+    ...j,
+    status:   becomingDone ? 'done' : 'open',
+    dateDone: becomingDone ? today  : '',
+  };
   // Оптимістично оновлюємо UI одразу
   state.repairs = state.repairs.map(r => r.id == id ? updated : r);
   renderRepairs();
-  toast('Статус оновлено', 'success');
+  toast(becomingDone ? 'Ремонт завершено' : 'Ремонт відкрито знову', 'success');
   // Зберігаємо у фоні
   api({ action: 'saveRepair', repair: updated }).then(res => {
     if (!res.ok) {
-      // Відкочуємо якщо помилка
       state.repairs = state.repairs.map(r => r.id == id ? j : r);
       renderRepairs();
       toast(res.error || 'Помилка збереження', 'error');
@@ -1303,26 +1339,37 @@ function openRepairModal(id = null) {
   fillSupplierSelect();
   fillPartCatSelect();
 
+  // Список майстрів
+  const masterSel = document.getElementById('f-master');
+  if (masterSel) {
+    const masters = state.users.filter(u => u.role === 'master' || u.role === 'admin');
+    masterSel.innerHTML = '<option value="">— не вказано —</option>' +
+      masters.map(u => `<option value="${escapeHtml(u.login)}">${escapeHtml(u.login)}</option>`).join('');
+  }
+
   if (id) {
     const j = state.repairs.find(r => r.id == id);
     if (j) {
-      document.getElementById('f-car').value    = j.car || '';
-      document.getElementById('f-vin').value    = j.vin || '';
-      document.getElementById('f-client').value = j.client || '';
-      document.getElementById('f-phone').value  = j.phone || '';
-      document.getElementById('f-date').value   = j.date || '';
-      document.getElementById('f-status').value = j.status || 'open';
-      document.getElementById('f-notes').value  = j.notes || '';
+      document.getElementById('f-car').value      = j.car || '';
+      document.getElementById('f-vin').value      = j.vin || '';
+      document.getElementById('f-client').value   = j.client || '';
+      document.getElementById('f-phone').value    = j.phone || '';
+      document.getElementById('f-date').value     = j.date || '';
+      document.getElementById('f-date-done').value = j.dateDone || '';
+      document.getElementById('f-status').value   = j.status || 'open';
+      document.getElementById('f-notes').value    = j.notes || '';
+      if (masterSel) masterSel.value = j.master || '';
       state.formWorks   = (j.works   || []).map(w => ({ ...w, id: w.id || Date.now() + Math.random() }));
       state.formCodings = (j.codings || []).map(c => ({ ...c, id: c.id || Date.now() + Math.random() }));
       state.formParts   = (j.parts   || []).map(p => ({ ...p, id: p.id || Date.now() + Math.random() }));
     }
   } else {
-    ['f-car','f-vin','f-client','f-phone','f-notes'].forEach(fid => {
+    ['f-car','f-vin','f-client','f-phone','f-notes','f-date-done'].forEach(fid => {
       const el = document.getElementById(fid); if (el) el.value = '';
     });
     document.getElementById('f-date').value   = new Date().toISOString().split('T')[0];
     document.getElementById('f-status').value = 'open';
+    if (masterSel) masterSel.value = state.login || '';
     state.formWorks   = [];
     state.formCodings = [];
   }
@@ -1331,7 +1378,6 @@ function openRepairModal(id = null) {
   renderFormCodings();
   renderFormParts();
   calcFormTotal();
-  // Hide admin-only fields based on role
   document.querySelectorAll('#repair-modal .admin-only').forEach(el => {
     el.style.display = state.role === 'admin' ? '' : 'none';
   });
@@ -1418,6 +1464,12 @@ function calcFormWorkTotal() {
   if (el) el.textContent = total + ' грн';
 }
 
+function updateFormWorkName(id, value) {
+  state.formWorks = state.formWorks.map(w => w.id == id ? { ...w, name: value } : w);
+  const el = document.querySelector(`#witem-${id} .part-item-name`);
+  if (el) el.textContent = value;
+}
+
 function renderFormWorks() {
   const el = document.getElementById('form-works-list');
   if (!el) return;
@@ -1426,10 +1478,15 @@ function renderFormWorks() {
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="part-item-name" style="flex:1">${escapeHtml(w.name)}</span>
         <span class="wi-price part-item-price">${fmtNum(w.retail)} грн</span>
+        <button class="btn-d" style="padding:3px 8px;font-size:14px" title="Редагувати" onclick="toggleWorkEdit(${w.id})">✎</button>
         <button class="btn-d" style="padding:3px 8px" onclick="removeFormWork(${w.id})">×</button>
       </div>
       <div class="part-item-edit" id="wedit-${w.id}">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="fl fw" style="grid-column:1/-1"><label>Назва роботи</label>
+            <input type="text" value="${escapeHtml(w.name)}"
+              oninput="updateFormWorkName(${w.id},this.value)">
+          </div>
           <div class="fl"><label>Роздрібна (грн)</label>
             <input type="number" value="${w.retail||0}" min="0"
               oninput="updateFormWork(${w.id},'retail',this.value)">
@@ -1598,7 +1655,7 @@ function onPartCatSelect() {
       if (c > 0 && sale > 0) {
         const margin = sale - c;
         document.getElementById('mu-preview').textContent =
-          'Маржа: ' + margin + ' грн (' + Math.round(margin / sale * 100) + '%)';
+          'Маржа: ' + margin + ' грн (' + (sale > 0 ? Math.round(margin / sale * 100) : 0) + '%)';
       }
     }
   }
@@ -1628,10 +1685,19 @@ function calcPartSale() {
 function calcPartMargin() {
   const cost = parseFloat(document.getElementById('p-cost').value) || 0;
   const sale = parseFloat(document.getElementById('p-sale').value) || 0;
-  if (cost > 0 && sale > 0) {
+  if (cost > 0 && sale >= 0) {
     const margin = sale - cost;
+    // Перераховуємо markup відповідно до поточного типу
+    if (state.muType === 'pct') {
+      const newMarkup = cost > 0 ? Math.round((sale - cost) / cost * 100 * 10) / 10 : 0;
+      document.getElementById('p-markup').value = newMarkup;
+    } else {
+      document.getElementById('p-markup').value = Math.round(sale - cost);
+    }
     document.getElementById('mu-preview').textContent =
-      `Маржа: ${margin} грн (${Math.round(margin / sale * 100)}%)`;
+      cost > 0 && sale > 0
+        ? `Маржа: ${Math.round(margin)} грн (${Math.round(margin / sale * 100)}%)`
+        : '';
   }
 }
 
@@ -1712,6 +1778,7 @@ function renderFormParts() {
                 <button class="tb ${p.markupType==='fix'?'active':''}" onclick="updateFormPartMuType(${p.id},'fix',this)">грн</button>
               </div>
               <input type="number" value="${p.markup||''}" min="0" placeholder="0" style="flex:1"
+                id="pedit-markup-${p.id}"
                 onchange="updateFormPartPrice(${p.id},'markup',this.value)">
             </div>
           </div>
@@ -1742,10 +1809,20 @@ function updateFormPart(id, field, value) {
   state.formParts = state.formParts.map(p => {
     if (p.id != id) return p;
     const updated = { ...p, [field]: field === 'qty' || field === 'sale' ? parseFloat(value)||0 : value };
+    // При ручній зміні sale — перераховуємо markup
+    if (field === 'sale' && updated.cost > 0) {
+      const sale = updated.sale;
+      const cost = updated.cost;
+      updated.markup = updated.markupType === 'fix'
+        ? Math.round(sale - cost)
+        : Math.round((sale - cost) / cost * 100 * 10) / 10;
+      // Оновлюємо поле markup в DOM
+      const markupEl = document.getElementById('pedit-markup-' + id);
+      if (markupEl) markupEl.value = updated.markup;
+    }
     return updated;
   });
   calcFormTotal();
-  // Оновлюємо тільки ціну і маржу без перемальовки всього
   const p = state.formParts.find(p => p.id == id);
   if (p) {
     const saleEl = document.querySelector(`#pitem-${id} .part-item-price`);
@@ -1846,6 +1923,8 @@ async function saveRepair() {
     codings: [...state.formCodings],
     parts: state.formParts,
     date: document.getElementById('f-date').value,
+    dateDone: document.getElementById('f-date-done').value || '',
+    master: document.getElementById('f-master')?.value || '',
     notes: document.getElementById('f-notes').value.trim(),
     status: document.getElementById('f-status').value,
     worksTotal:   Math.round(worksTotal),
@@ -2062,44 +2141,97 @@ function renderStats() {
   const from = document.getElementById('stat-from').value;
   const to   = document.getElementById('stat-to').value;
   const all  = state.repairs;
+
+  // Відкриті за період (по даті створення)
   const inPeriod = all.filter(j => j.date && j.date >= from && j.date <= to);
-  const done = inPeriod.filter(j => j.status === 'done');
+  const openCount = inPeriod.filter(j => j.status === 'open').length;
 
-  const laborRevenue = done.reduce((s, j) => s +
-    (j.worksTotal || 0) + (j.codingsTotal || 0), 0);
-  const laborCost    = done.reduce((s, j) => s +
-    (j.worksCost || 0) + (j.codingsCost || 0), 0);
-  const partsCost    = done.reduce((s, j) => s + (j.parts || []).reduce((a, p) => a + (parseFloat(p.cost)||0) * (parseFloat(p.qty)||1), 0), 0);
-  const partsRevenue = done.reduce((s, j) => s + (j.parts || []).reduce((a, p) => a + (parseFloat(p.sale)||0) * (parseFloat(p.qty)||1), 0), 0);
-  const totalRevenue = laborRevenue + partsRevenue;
-  const partsMargin  = partsRevenue - partsCost;
-  const laborProfit  = laborRevenue - laborCost;
-  const totalProfit  = laborProfit + partsMargin;
-  const openCount    = all.filter(j => j.status === 'open').length;
+  // Завершені за період — фільтр по dateDone (якщо є), інакше по date
+  const done = all.filter(j =>
+    j.status === 'done' && (
+      j.dateDone ? (j.dateDone >= from && j.dateDone <= to)
+                 : (j.date && j.date >= from && j.date <= to)
+    )
+  );
 
-  // Борги
-  const totalDebt = all.reduce((s, j) => {
-    const p = (j.payments||[]).reduce((a,p) => a+(p.amount||0), 0);
-    return s + Math.max(0, (j.total||0) - p);
-  }, 0);
-  const debtors = all.filter(j => {
-    const p = (j.payments||[]).reduce((a,p) => a+(p.amount||0), 0);
-    return (j.total||0) - p > 0;
-  }).length;
+  // ---- Рахуємо ВСЕ з масивів, не зі збережених totals ----
+  function calcRepairTotals(j) {
+    const worksRev  = (j.works   ||[]).reduce((s,w)=>s+(w.retail||0), 0);
+    const worksCost = (j.works   ||[]).reduce((s,w)=>s+(w.cost  ||0), 0);
+    const codRev    = (j.codings ||[]).reduce((s,c)=>s+(c.retail||0), 0);
+    const codCost   = (j.codings ||[]).reduce((s,c)=>s+(c.cost  ||0), 0);
+    const partsRev  = (j.parts   ||[]).reduce((s,p)=>s+(parseFloat(p.sale)||0)*(parseFloat(p.qty)||1), 0);
+    const partsCost = (j.parts   ||[]).reduce((s,p)=>s+(parseFloat(p.cost)||0)*(parseFloat(p.qty)||1), 0);
+    return { worksRev, worksCost, codRev, codCost, partsRev, partsCost };
+  }
 
-  // Кодування окремо
-  const codingsRevDone = done.reduce((s,j) => s + (j.codingsTotal||0), 0);
-  const codingsCostDone = done.reduce((s,j) => s + (j.codingsCost||0), 0);
+  // Зведені суми по завершених
+  let worksRev=0, worksCost=0, codRev=0, codCost=0, partsRev=0, partsCost=0;
+  done.forEach(j => {
+    const t = calcRepairTotals(j);
+    worksRev  += t.worksRev;  worksCost += t.worksCost;
+    codRev    += t.codRev;    codCost   += t.codCost;
+    partsRev  += t.partsRev;  partsCost += t.partsCost;
+  });
+
+  // KPI розрахунки
+  const worksProfit   = worksRev  - worksCost;
+  const codProfit     = codRev    - codCost;
+  const partsMarginAll = partsRev - partsCost;
+
+  // Маржа запчастин — без Вітя / BimmerGarage
+  const excludedSup = ['вітя', 'bimmergarage', 'bimmer garage'];
+  const partsMarginNew = done.reduce((s, j) => s + (j.parts||[]).reduce((a, p) => {
+    if (excludedSup.some(ex => (p.supplier||'').toLowerCase().includes(ex))) return a;
+    return a + ((parseFloat(p.sale)||0) - (parseFloat(p.cost)||0)) * (parseFloat(p.qty)||1);
+  }, 0), 0);
+
+  // Виручка = роботи + запчастини (кодування — окрема графа)
+  const revenue = worksRev + partsRev;
+
+  // Прибуток майстрів по кожному — з масивів
+  const masterProfit = {};
+  done.forEach(j => {
+    const master = j.master || '—';
+    if (!masterProfit[master]) masterProfit[master] = { rev: 0, cost: 0 };
+    const t = calcRepairTotals(j);
+    masterProfit[master].rev  += t.worksRev;
+    masterProfit[master].cost += t.worksCost;
+  });
+  const totalMasterProfit = Object.values(masterProfit).reduce((s, m) => s + (m.rev - m.cost), 0);
+
+  // Борги та переплати (всі ремонти)
+  let totalDebt = 0, debtors = 0, totalOverpaid = 0, overpaidCount = 0;
+  all.forEach(j => {
+    const paid = (j.payments||[]).reduce((a,p) => a+(p.amount||0), 0);
+    const t = calcRepairTotals(j);
+    const total = t.worksRev + t.codRev + t.partsRev;
+    const diff = total - paid;
+    if (diff > 0) { totalDebt += diff; debtors++; }
+    if (diff < 0) { totalOverpaid += Math.abs(diff); overpaidCount++; }
+  });
 
   document.getElementById('kpi-row').innerHTML = `
     <div class="kpi gray"><div class="kpi-label">Всього ремонтів</div><div class="kpi-val">${all.length}</div><div class="kpi-sub">за весь час</div></div>
-    <div class="kpi red"><div class="kpi-label">Відкриті</div><div class="kpi-val red">${openCount}</div><div class="kpi-sub">в роботі</div></div>
-    <div class="kpi blue"><div class="kpi-label">Виручка (завершені)</div><div class="kpi-val blue">${Math.round(totalRevenue).toLocaleString()}</div><div class="kpi-sub">грн за період</div></div>
-    <div class="kpi green"><div class="kpi-label">Чистий прибуток</div><div class="kpi-val green">${Math.round(totalProfit).toLocaleString()}</div><div class="kpi-sub">грн за період</div></div>
-    <div class="kpi amber"><div class="kpi-label">Маржа запчастин</div><div class="kpi-val amber">${Math.round(partsMargin).toLocaleString()}</div><div class="kpi-sub">грн за період</div></div>
-    <div class="kpi blue"><div class="kpi-label">Прибуток з робіт</div><div class="kpi-val blue">${Math.round(laborProfit).toLocaleString()}</div><div class="kpi-sub">роздрібна − собів.</div></div>
-    <div class="kpi amber"><div class="kpi-label">Кодування</div><div class="kpi-val amber">${Math.round(codingsRevDone).toLocaleString()}</div><div class="kpi-sub">виручка / прибуток: ${Math.round(codingsRevDone-codingsCostDone).toLocaleString()} грн</div></div>
-    <div class="kpi red"><div class="kpi-label">Загальний борг</div><div class="kpi-val red">${Math.round(totalDebt).toLocaleString()}</div><div class="kpi-sub">${debtors} боржників</div></div>`;
+    <div class="kpi red"><div class="kpi-label">Відкриті</div><div class="kpi-val red">${openCount}</div><div class="kpi-sub">за обраний період</div></div>
+    <div class="kpi blue"><div class="kpi-label">Виручка (завершені)</div><div class="kpi-val blue">${Math.round(revenue).toLocaleString()}</div><div class="kpi-sub">з ремонтів та запчастин</div></div>
+    <div class="kpi green"><div class="kpi-label">Прибуток робіт</div><div class="kpi-val green">${Math.round(worksProfit).toLocaleString()}</div><div class="kpi-sub">роздрібна − собів. (без код.)</div></div>
+    <div class="kpi amber"><div class="kpi-label">Маржа запчастин</div><div class="kpi-val amber">${Math.round(partsMarginNew).toLocaleString()}</div><div class="kpi-sub">нових (без Вітя/BimmerGarage)</div></div>
+    <div class="kpi blue" style="cursor:pointer" onclick="toggleMasterStats()">
+      <div class="kpi-label">Прибуток майстрів ▾</div>
+      <div class="kpi-val blue">${Math.round(totalMasterProfit).toLocaleString()}</div>
+      <div class="kpi-sub">клікни для деталей</div>
+      <div id="master-stats-detail" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+        ${Object.entries(masterProfit).map(([name, v]) => `
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0">
+            <span style="color:var(--text2)">${escapeHtml(name)}</span>
+            <span style="color:var(--green2);font-weight:700">+${Math.round(v.rev-v.cost).toLocaleString()} грн</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="kpi amber"><div class="kpi-label">Кодування</div><div class="kpi-val amber">${Math.round(codRev).toLocaleString()}</div><div class="kpi-sub">виручка / прибуток: +${Math.round(codProfit).toLocaleString()} грн</div></div>
+    <div class="kpi red"><div class="kpi-label">Загальний борг</div><div class="kpi-val red">${Math.round(totalDebt).toLocaleString()}</div><div class="kpi-sub">${debtors} боржників</div></div>
+    ${totalOverpaid > 0 ? `<div class="kpi green"><div class="kpi-label">Переплати клієнтів</div><div class="kpi-val green">${Math.round(totalOverpaid).toLocaleString()}</div><div class="kpi-sub">${overpaidCount} клієнтів переплатили</div></div>` : ''}`;
 
   // Заповнюємо список ремонтів для аналізу
   const sel = document.getElementById('stat-repair-sel');
@@ -2110,7 +2242,7 @@ function renderStats() {
     ).join('');
   if (prevVal) sel.value = prevVal;
 
-  // Топ робіт — тільки ЗАВЕРШЕНІ
+  // Топ робіт — тільки ЗАВЕРШЕНІ, з масивів
   const wc = {};
   done.forEach(j => {
     [...(j.works||[]), ...(j.codings||[])].forEach(w => {
@@ -2126,9 +2258,11 @@ function renderStats() {
       <span class="stat-val">${c} шт.</span>
     </div>`).join('') || '<div style="color:var(--text3);font-size:13px">Немає даних</div>';
 
+  // Постачальники — з усіх ремонтів за період (по даті створення)
+  const allPeriod = all.filter(j => j.date && j.date >= from && j.date <= to);
   const sc = {};
-  inPeriod.forEach(j => (j.parts || []).forEach(p => {
-    if (p.supplier) sc[p.supplier] = (sc[p.supplier] || 0) + (p.cost||0) * p.qty;
+  allPeriod.forEach(j => (j.parts || []).forEach(p => {
+    if (p.supplier) sc[p.supplier] = (sc[p.supplier] || 0) + (parseFloat(p.cost)||0) * (parseFloat(p.qty)||1);
   }));
   const ss = Object.entries(sc).sort((a, b) => b[1] - a[1]);
   const ms = ss[0] ? ss[0][1] : 1;
@@ -2139,7 +2273,7 @@ function renderStats() {
       <span class="stat-val">${Math.round(c).toLocaleString()} грн</span>
     </div>`).join('') || '<div style="color:var(--text3);font-size:13px">Немає даних</div>';
 
-  // Фінанси по видах робіт — ВИПРАВЛЕНО: cost → собівартість, retail → виручка
+  // Фінанси по видах робіт — з масивів, тільки завершені
   const wf = {};
   done.forEach(j => {
     [...(j.works||[]), ...(j.codings||[])].forEach(w => {
@@ -2159,19 +2293,22 @@ function renderStats() {
       <span style="text-align:right">${Math.round(w.retail).toLocaleString()} / <b style="color:var(--green2)">+${Math.round(w.retail - w.cost).toLocaleString()}</b> грн</span>
     </div>`).join('') : '<div style="color:var(--text3);font-size:13px">Немає завершених ремонтів за цей період</div>';
 
+  // Запчастини — з масивів, всі ремонти за період (по даті створення)
   const pa = {};
-  inPeriod.forEach(j => (j.parts || []).forEach(p => {
+  allPeriod.forEach(j => (j.parts || []).forEach(p => {
     if (!pa[p.name]) pa[p.name] = { name: p.name, unit: p.unit||'шт', qty: 0, cost: 0, sale: 0 };
-    pa[p.name].qty  += p.qty;
-    pa[p.name].cost += (p.cost||0) * p.qty;
-    pa[p.name].sale += p.sale * p.qty;
+    pa[p.name].qty  += parseFloat(p.qty)  || 0;
+    pa[p.name].cost += (parseFloat(p.cost)||0) * (parseFloat(p.qty)||1);
+    pa[p.name].sale += (parseFloat(p.sale)||0) * (parseFloat(p.qty)||1);
   }));
   const paList = Object.values(pa).sort((a, b) => b.qty - a.qty);
 
-  // Боржники
+  // Боржники — з масивів (calcRepairTotals вже визначена вище)
   const debtorsList = all.map(j => {
-    const p = (j.payments||[]).reduce((s,p) => s+(p.amount||0), 0);
-    return { car: j.car, client: j.client||'—', debt: Math.round((j.total||0) - p) };
+    const t = calcRepairTotals(j);
+    const totalCalc = t.worksRev + t.codRev + t.partsRev;
+    const paid = (j.payments||[]).reduce((s,p) => s+(p.amount||0), 0);
+    return { car: j.car, client: j.client||'—', debt: Math.round(totalCalc - paid) };
   }).filter(d => d.debt > 0).sort((a,b) => b.debt - a.debt);
 
   document.getElementById('stat-debtors').innerHTML = debtorsList.length
@@ -2183,7 +2320,6 @@ function renderStats() {
       </div>`).join('')
     : '<div style="color:var(--text3);font-size:13px">Боржників немає</div>';
 
-  // Витрати запчастин — ВИПРАВЛЕНО: cost (закупівля) і sale (продаж)
   document.getElementById('stat-parts').innerHTML = paList.length ? `
     <div class="pst-head"><span>Назва</span><span style="text-align:right">Кількість</span><span style="text-align:right">Закупівля</span><span style="text-align:right">Продаж</span></div>` +
     paList.map(p => `
@@ -2193,6 +2329,9 @@ function renderStats() {
       <span style="text-align:right;color:var(--text3)">${Math.round(p.cost).toLocaleString()} грн</span>
       <span style="text-align:right;color:var(--green2)">${Math.round(p.sale).toLocaleString()} грн</span>
     </div>`).join('') : '<div style="color:var(--text3);font-size:13px">Немає даних за цей період</div>';
+
+  renderSupplierDebts();
+  renderMasterSalaries(from, to);
 }
 
 function renderRepairAnalysis() {
@@ -2269,6 +2408,107 @@ function renderRepairAnalysis() {
       </div>
     </div>`).join('')
     : '<div style="color:var(--text3);font-size:13px;padding:6px 0">Запчастин немає</div>';
+}
+
+function toggleMasterStats() {
+  const el = document.getElementById('master-stats-detail');
+  if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+function renderSupplierDebts() {
+  const el = document.getElementById('stat-sup-debts');
+  if (!el) return;
+  const payments = JSON.parse(localStorage.getItem('bg_sup_payments') || '{}');
+  const debtMap = {};
+  state.repairs.forEach(j => {
+    (j.parts||[]).forEach(p => {
+      const s = p.supplier || '—';
+      if (!debtMap[s]) debtMap[s] = 0;
+      debtMap[s] += (p.cost||0) * (p.qty||1);
+    });
+  });
+  el.innerHTML = Object.entries(debtMap).sort((a,b)=>b[1]-a[1]).map(([s, total]) => {
+    const paid = payments[s] || 0;
+    const debt = Math.round(total - paid);
+    const debtColor = debt > 0 ? '#e05050' : '#27c47a';
+    return `<div class="ra-sup-item">
+      <span class="sup-badge ${supClass(s)}" style="min-width:90px">${escapeHtml(s)}</span>
+      <div style="flex:1;font-size:12px;color:var(--text3);margin-left:6px">
+        закуп: ${Math.round(total).toLocaleString()} грн<br>
+        <span style="color:#27c47a">сплачено: ${Math.round(paid).toLocaleString()} грн</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '} ${Math.abs(debt).toLocaleString()} грн</div>
+        <div style="display:flex;gap:4px;margin-top:4px;justify-content:flex-end">
+          <input type="number" placeholder="сплатити" min="0" style="width:90px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px" id="sup-pay-${escapeHtml(s)}">
+          <button class="btn-p sm" style="font-size:11px;padding:4px 8px" onclick="addSupplierPayment('${escapeHtml(s)}')">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-size:13px">Немає запчастин</div>';
+}
+
+function addSupplierPayment(supplier) {
+  const inp = document.getElementById('sup-pay-' + supplier);
+  const amount = parseFloat(inp?.value) || 0;
+  if (!amount) return;
+  const payments = JSON.parse(localStorage.getItem('bg_sup_payments') || '{}');
+  payments[supplier] = (payments[supplier] || 0) + amount;
+  localStorage.setItem('bg_sup_payments', JSON.stringify(payments));
+  inp.value = '';
+  renderSupplierDebts();
+  toast('Оплату враховано', 'success');
+}
+
+function renderMasterSalaries(from, to) {
+  const el = document.getElementById('stat-master-salaries');
+  if (!el) return;
+  const salaryPayments = JSON.parse(localStorage.getItem('bg_salary_payments') || '{}');
+  const done = state.repairs.filter(j =>
+    j.status === 'done' && (
+      j.dateDone ? (j.dateDone >= from && j.dateDone <= to)
+                 : (j.date && j.date >= from && j.date <= to)
+    )
+  );
+  const salaryMap = {};
+  done.forEach(j => {
+    const master = j.master || '—';
+    if (!salaryMap[master]) salaryMap[master] = 0;
+    // Зарплата = worksCost з масиву works (собівартість робіт)
+    salaryMap[master] += (j.works||[]).reduce((s,w) => s+(w.cost||0), 0);
+  });
+  el.innerHTML = Object.entries(salaryMap).sort((a,b)=>b[1]-a[1]).map(([master, earned]) => {
+    const paid = salaryPayments[master] || 0;
+    const debt = Math.round(earned - paid);
+    const debtColor = debt > 0 ? '#e05050' : '#27c47a';
+    return `<div class="ra-sup-item">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px;color:var(--text)">${escapeHtml(master)}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">нараховано: ${Math.round(earned).toLocaleString()} грн · сплачено: ${Math.round(paid).toLocaleString()} грн</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '} ${Math.abs(debt).toLocaleString()} грн</div>
+        <div style="display:flex;gap:4px;margin-top:4px;justify-content:flex-end">
+          <input type="number" placeholder="виплатити" min="0" style="width:90px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px" id="sal-pay-${escapeHtml(master)}">
+          <button class="btn-p sm" style="font-size:11px;padding:4px 8px" onclick="addSalaryPayment('${escapeHtml(master)}')">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-size:13px">Немає даних за цей період</div>';
+}
+
+function addSalaryPayment(master) {
+  const inp = document.getElementById('sal-pay-' + master);
+  const amount = parseFloat(inp?.value) || 0;
+  if (!amount) return;
+  const payments = JSON.parse(localStorage.getItem('bg_salary_payments') || '{}');
+  payments[master] = (payments[master] || 0) + amount;
+  localStorage.setItem('bg_salary_payments', JSON.stringify(payments));
+  inp.value = '';
+  const from = document.getElementById('stat-from').value;
+  const to   = document.getElementById('stat-to').value;
+  renderMasterSalaries(from, to);
+  toast('Виплату враховано', 'success');
 }
 
 // ============================================================
@@ -2411,8 +2651,18 @@ function recalcPartSale(id) {
 }
 
 function recalcPartMargin(id) {
-  const cost = parseFloat(document.getElementById('pcost-' + id)?.value) || 0;
-  const sale = parseFloat(document.getElementById('psale-' + id)?.value) || 0;
+  const cost = parseFloat(document.getElementById('pcost-'   + id)?.value) || 0;
+  const sale = parseFloat(document.getElementById('psale-'   + id)?.value) || 0;
+  const p    = state.parts.find(x => x.id == id);
+  const type = p ? (p.markupType || 'pct') : 'pct';
+  if (cost > 0) {
+    // Перераховуємо markup з нового sale
+    const newMarkup = type === 'pct'
+      ? Math.round((sale - cost) / cost * 100 * 10) / 10
+      : Math.round(sale - cost);
+    const markupEl = document.getElementById('pmarkup-' + id);
+    if (markupEl) markupEl.value = newMarkup;
+  }
   updatePartMarginDisplay(id, cost, sale);
 }
 
@@ -2789,6 +3039,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-34</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-39</div>
 </body>
 </html>
