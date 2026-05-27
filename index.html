@@ -283,8 +283,8 @@ a{color:inherit;text-decoration:none}
 .pt-markup-wrap input{flex:1;min-width:0}
 
 .users-table{width:100%}
-.ut-head{display:grid;grid-template-columns:1fr 100px 120px 40px;gap:8px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:700;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
-.ut-row{display:grid;grid-template-columns:1fr 100px 120px 40px;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:center}
+.ut-head{display:none}
+.ut-row{padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
 .ut-row:last-child{border-bottom:none}
 .role-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em}
 .role-admin{background:rgba(200,0,0,.12);color:var(--red2);border:1px solid rgba(200,0,0,.2)}
@@ -633,11 +633,8 @@ a{color:inherit;text-decoration:none}
       <!-- Користувачі -->
       <div class="settings-panel full" id="users-panel">
         <div class="sp-title">Користувачі</div>
-        <div class="ut-head">
-          <span>Логін</span><span>Роль</span><span>Останній вхід</span><span></span>
-        </div>
         <div id="users-list"></div>
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:10px">
           <input type="text" id="new-user-login" placeholder="Логін" style="flex:1;min-width:100px">
           <input type="password" id="new-user-pass" placeholder="Пароль" style="flex:1;min-width:100px">
           <select id="new-user-role" style="width:130px">
@@ -2984,28 +2981,29 @@ async function deleteWork(id) {
 function renderUsers() {
   document.getElementById('users-list').innerHTML = state.users.map(u => `
     <div class="ut-row" id="urow-${u.id}">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <div style="flex:1;min-width:0">
-          <span style="font-weight:700;font-size:13px">${escapeHtml(u.login)}</span>
-          <span class="role-badge role-${escapeHtml(u.role)}" style="margin-left:6px">${escapeHtml(roleLabel(u.role))}</span>
-        </div>
-        <span style="color:var(--text3);font-size:11px;white-space:nowrap">${escapeHtml(u.lastLogin||'—')}</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-weight:700;font-size:13px;flex:1;min-width:80px">${escapeHtml(u.login)}</span>
+        <span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(roleLabel(u.role))}</span>
+        <span style="color:var(--text3);font-size:11px">${escapeHtml(u.lastLogin||'—')}</span>
         <button class="btn-d" style="padding:3px 8px;font-size:14px" title="Редагувати" onclick="toggleUserEdit('${u.id}')">✎</button>
         <button class="btn-d" onclick="deleteUser('${u.id}')">×</button>
       </div>
-      <div class="part-item-edit" id="uedit-${u.id}">
+      <div class="part-item-edit" id="uedit-${u.id}" style="margin-top:8px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div class="fl"><label>Логін / Імʼя</label>
+          <div class="fl">
+            <label>Логін / Імʼя</label>
             <input type="text" id="uedit-login-${u.id}" value="${escapeHtml(u.login)}">
           </div>
-          <div class="fl"><label>Роль</label>
+          <div class="fl">
+            <label>Роль</label>
             <select id="uedit-role-${u.id}">
-              <option value="master"  ${u.role==='master' ?'selected':''}>Майстер</option>
-              <option value="viewer"  ${u.role==='viewer' ?'selected':''}>Перегляд</option>
-              <option value="admin"   ${u.role==='admin'  ?'selected':''}>Admin</option>
+              <option value="master" ${u.role==='master'?'selected':''}>Майстер</option>
+              <option value="viewer" ${u.role==='viewer'?'selected':''}>Перегляд</option>
+              <option value="admin"  ${u.role==='admin' ?'selected':''}>Admin</option>
             </select>
           </div>
-          <div class="fl" style="grid-column:1/-1"><label>Новий пароль (залиш порожнім якщо не змінювати)</label>
+          <div class="fl" style="grid-column:1/-1">
+            <label>Новий пароль (залиш порожнім якщо не змінювати)</label>
             <input type="password" id="uedit-pass-${u.id}" placeholder="••••••••">
           </div>
         </div>
@@ -3110,6 +3108,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-41</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-42</div>
 </body>
 </html>
