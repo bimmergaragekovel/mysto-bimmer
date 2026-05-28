@@ -2198,16 +2198,15 @@ function renderStats() {
   // Виручка = роботи + запчастини (кодування — окрема графа)
   const revenue = worksRev + partsRev;
 
-  // Прибуток майстрів по кожному — з масивів
+  // Прибуток майстрів — сума зарплат (worksCost) по кожному майстру
   const masterProfit = {};
   done.forEach(j => {
     const master = j.master || '—';
-    if (!masterProfit[master]) masterProfit[master] = { rev: 0, cost: 0 };
+    if (!masterProfit[master]) masterProfit[master] = { salary: 0 };
     const t = calcRepairTotals(j);
-    masterProfit[master].rev  += t.worksRev;
-    masterProfit[master].cost += t.worksCost;
+    masterProfit[master].salary += t.worksCost;
   });
-  const totalMasterProfit = Object.values(masterProfit).reduce((s, m) => s + (m.rev - m.cost), 0);
+  const totalMasterProfit = Object.values(masterProfit).reduce((s, m) => s + m.salary, 0);
 
   // Борги та переплати (всі ремонти)
   let totalDebt = 0, debtors = 0, totalOverpaid = 0, overpaidCount = 0;
@@ -2227,14 +2226,14 @@ function renderStats() {
     <div class="kpi green"><div class="kpi-label">Прибуток робіт</div><div class="kpi-val green">${Math.round(worksProfit).toLocaleString()}</div><div class="kpi-sub">роздрібна − собів. (без код.)</div></div>
     <div class="kpi amber"><div class="kpi-label">Маржа запчастин</div><div class="kpi-val amber">${Math.round(partsMarginNew).toLocaleString()}</div><div class="kpi-sub">нових (без Вітя/BimmerGarage)</div></div>
     <div class="kpi blue" style="cursor:pointer" onclick="toggleMasterStats()">
-      <div class="kpi-label">Прибуток майстрів ▾</div>
+      <div class="kpi-label">Зарплата майстрів ▾</div>
       <div class="kpi-val blue">${Math.round(totalMasterProfit).toLocaleString()}</div>
-      <div class="kpi-sub">клікни для деталей</div>
+      <div class="kpi-sub">нараховано за період</div>
       <div id="master-stats-detail" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
         ${Object.entries(masterProfit).map(([name, v]) => `
           <div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0">
             <span style="color:var(--text2)">${escapeHtml(name)}</span>
-            <span style="color:var(--green2);font-weight:700">+${Math.round(v.rev-v.cost).toLocaleString()} грн</span>
+            <span style="color:var(--green2);font-weight:700">${Math.round(v.salary).toLocaleString()} грн</span>
           </div>`).join('')}
       </div>
     </div>
@@ -3108,6 +3107,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-42</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-43</div>
 </body>
 </html>
