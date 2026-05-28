@@ -2443,32 +2443,73 @@ function toggleMasterStats() {
 function renderSupplierDebts() {
   const el = document.getElementById('stat-sup-debts');
   if (!el) return;
-  const payments = JSON.parse(localStorage.getItem('bg_sup_payments') || '{}');
+
+  // Отримуємо обраний період зі статистики
+  const from = document.getElementById('stat-from')?.value || '';
+  const to   = document.getElementById('stat-to')?.value   || '';
+
+  // payments зберігаємо як масив { date, amount, note }
+  // Міграція старого формату (число → масив)
+  let allPayments = JSON.parse(localStorage.getItem('bg_sup_payments_v2') || '{}');
+
+  // Загальна сума закупівель по всіх ремонтах (без фільтру дат — це борг загалом)
   const debtMap = {};
   state.repairs.forEach(j => {
     (j.parts||[]).forEach(p => {
       const s = p.supplier || '—';
       if (!debtMap[s]) debtMap[s] = 0;
-      debtMap[s] += (p.cost||0) * (p.qty||1);
+      debtMap[s] += (parseFloat(p.cost)||0) * (parseFloat(p.qty)||1);
     });
   });
-  el.innerHTML = Object.entries(debtMap).sort((a,b)=>b[1]-a[1]).map(([s, total]) => {
-    const paid = payments[s] || 0;
-    const debt = Math.round(total - paid);
+
+  el.innerHTML = Object.entries(debtMap).sort((a,b)=>b[1]-a[1]).map(([s, totalCost]) => {
+    const supPayments = allPayments[s] || [];
+    // Всього сплачено (всі часи)
+    const totalPaid = supPayments.reduce((a,p) => a+(p.amount||0), 0);
+    // Сплачено за обраний період
+    const paidInPeriod = supPayments
+      .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
+      .reduce((a,p) => a+(p.amount||0), 0);
+    const debt = Math.round(totalCost - totalPaid);
     const debtColor = debt > 0 ? '#e05050' : '#27c47a';
-    return `<div class="ra-sup-item">
-      <span class="sup-badge ${supClass(s)}" style="min-width:90px">${escapeHtml(s)}</span>
-      <div style="flex:1;font-size:12px;color:var(--text3);margin-left:6px">
-        закуп: ${Math.round(total).toLocaleString()} грн<br>
-        <span style="color:#27c47a">сплачено: ${Math.round(paid).toLocaleString()} грн</span>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '} ${Math.abs(debt).toLocaleString()} грн</div>
-        <div style="display:flex;gap:4px;margin-top:4px;justify-content:flex-end">
-          <input type="number" placeholder="сплатити" min="0" style="width:90px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px" id="sup-pay-${escapeHtml(s)}">
-          <button class="btn-p sm" style="font-size:11px;padding:4px 8px" onclick="addSupplierPayment('${escapeHtml(s)}')">+</button>
+
+    // Платежі за обраний період для відображення
+    const periodPayments = supPayments
+      .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
+      .sort((a,b) => b.date.localeCompare(a.date));
+
+    return `<div class="ra-sup-item" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="sup-badge ${supClass(s)}" style="min-width:90px">${escapeHtml(s)}</span>
+        <div style="flex:1;font-size:12px">
+          <span style="color:var(--text2);font-weight:700">${Math.round(totalCost).toLocaleString()} грн</span>
+          <span style="color:var(--text3);margin-left:6px">загальна закупівля</span>
+          ${from && to ? `<br><span style="color:var(--text3)">за період сплачено: <b style="color:#27c47a">${Math.round(paidInPeriod).toLocaleString()} грн</b></span>` : ''}
+          <br><span style="color:var(--text3)">всього сплачено: <b style="color:#27c47a">${Math.round(totalPaid).toLocaleString()} грн</b></span>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:14px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '}${Math.abs(debt).toLocaleString()} грн</div>
+          <div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end">
+            <input type="number" placeholder="сума" min="0"
+              style="width:80px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px"
+              id="sup-pay-${escapeHtml(s)}">
+            <button class="btn-p sm" style="font-size:11px;padding:4px 8px"
+              onclick="addSupplierPayment('${escapeHtml(s)}')">+ Сплатити</button>
+          </div>
         </div>
       </div>
+      ${periodPayments.length ? `
+      <div style="border-top:1px solid var(--border);padding-top:6px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px">
+          Платежі${from && to ? ' за період' : ''}:
+        </div>
+        ${periodPayments.map(p => `
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bg4)">
+            <span style="color:var(--text3)">${escapeHtml(p.date ? new Date(p.date).toLocaleString('uk-UA', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')}</span>
+            ${p.note ? `<span style="color:var(--text3);font-size:11px;flex:1;margin:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.note)}</span>` : '<span></span>'}
+            <b style="color:#27c47a;white-space:nowrap">+${(p.amount||0).toLocaleString()} грн</b>
+          </div>`).join('')}
+      </div>` : ''}
     </div>`;
   }).join('') || '<div style="color:var(--text3);font-size:13px">Немає запчастин</div>';
 }
@@ -2476,13 +2517,21 @@ function renderSupplierDebts() {
 function addSupplierPayment(supplier) {
   const inp = document.getElementById('sup-pay-' + supplier);
   const amount = parseFloat(inp?.value) || 0;
-  if (!amount) return;
-  const payments = JSON.parse(localStorage.getItem('bg_sup_payments') || '{}');
-  payments[supplier] = (payments[supplier] || 0) + amount;
-  localStorage.setItem('bg_sup_payments', JSON.stringify(payments));
+  if (!amount) { toast('Введіть суму', 'error'); return; }
+
+  const allPayments = JSON.parse(localStorage.getItem('bg_sup_payments_v2') || '{}');
+  if (!allPayments[supplier]) allPayments[supplier] = [];
+
+  allPayments[supplier].push({
+    date:   new Date().toISOString(),
+    amount: Math.round(amount),
+    note:   '',
+  });
+
+  localStorage.setItem('bg_sup_payments_v2', JSON.stringify(allPayments));
   inp.value = '';
   renderSupplierDebts();
-  toast('Оплату враховано', 'success');
+  toast(`Сплачено ${Math.round(amount).toLocaleString()} грн → ${supplier}`, 'success');
 }
 
 function renderMasterSalaries(from, to) {
@@ -3124,6 +3173,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-44</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-45</div>
 </body>
 </html>
