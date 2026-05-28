@@ -1309,6 +1309,12 @@ async function toggleRepairStatus(id) {
       toast(res.error || 'Помилка збереження', 'error');
     } else {
       localStorage.removeItem('bg_cache_v2');
+      // Оновлюємо борги якщо статистика відкрита
+      if (document.getElementById('stats-tab')?.style.display !== 'none') {
+        renderStats();
+      } else {
+        renderSupplierDebts();
+      }
     }
   }).catch(() => {});
 }
@@ -1973,7 +1979,18 @@ async function saveRepair() {
       // Підвантажуємо свіжі дані з сервера щоб отримати збережені works/codings
       try {
         const fresh = await api({ action: 'initData' });
-        if (fresh && fresh.ok) { applyData(fresh); saveCache(fresh); renderRepairs(); }
+        if (fresh && fresh.ok) {
+          applyData(fresh);
+          saveCache(fresh);
+          renderRepairs();
+          // Оновлюємо борги постачальників якщо відкрита статистика
+          if (document.getElementById('stats-tab')?.style.display !== 'none') {
+            renderStats();
+          } else {
+            // Оновлюємо в фоні щоб дані були актуальні при наступному відкритті
+            renderSupplierDebts();
+          }
+        }
       } catch(e) {}
     }
   }).catch(() => {});
@@ -3107,6 +3124,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-43</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-44</div>
 </body>
 </html>
