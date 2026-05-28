@@ -2537,7 +2537,10 @@ function addSupplierPayment(supplier) {
 function renderMasterSalaries(from, to) {
   const el = document.getElementById('stat-master-salaries');
   if (!el) return;
-  const salaryPayments = JSON.parse(localStorage.getItem('bg_salary_payments') || '{}');
+
+  // Міграція старого формату (число → масив)
+  const allPayments = JSON.parse(localStorage.getItem('bg_salary_payments_v2') || '{}');
+
   const done = state.repairs.filter(j =>
     j.status === 'done' && (
       j.dateDone ? (j.dateDone >= from && j.dateDone <= to)
@@ -2548,25 +2551,61 @@ function renderMasterSalaries(from, to) {
   done.forEach(j => {
     const master = j.master || '—';
     if (!salaryMap[master]) salaryMap[master] = 0;
-    // Зарплата = worksCost з масиву works (собівартість робіт)
     salaryMap[master] += (j.works||[]).reduce((s,w) => s+(w.cost||0), 0);
   });
+
   el.innerHTML = Object.entries(salaryMap).sort((a,b)=>b[1]-a[1]).map(([master, earned]) => {
-    const paid = salaryPayments[master] || 0;
-    const debt = Math.round(earned - paid);
+    const masterPayments = allPayments[master] || [];
+    // Всього виплачено (всі часи)
+    const totalPaid = masterPayments.reduce((a,p) => a+(p.amount||0), 0);
+    // Виплачено за обраний період
+    const paidInPeriod = masterPayments
+      .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
+      .reduce((a,p) => a+(p.amount||0), 0);
+    const debt = Math.round(earned - totalPaid);
     const debtColor = debt > 0 ? '#e05050' : '#27c47a';
-    return `<div class="ra-sup-item">
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:13px;color:var(--text)">${escapeHtml(master)}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px">нараховано: ${Math.round(earned).toLocaleString()} грн · сплачено: ${Math.round(paid).toLocaleString()} грн</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '} ${Math.abs(debt).toLocaleString()} грн</div>
-        <div style="display:flex;gap:4px;margin-top:4px;justify-content:flex-end">
-          <input type="number" placeholder="виплатити" min="0" style="width:90px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px" id="sal-pay-${escapeHtml(master)}">
-          <button class="btn-p sm" style="font-size:11px;padding:4px 8px" onclick="addSalaryPayment('${escapeHtml(master)}')">+</button>
+
+    // Платежі за обраний період
+    const periodPayments = masterPayments
+      .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
+      .sort((a,b) => b.date.localeCompare(a.date));
+
+    return `<div class="ra-sup-item" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px">
+          <div style="font-weight:700;font-size:13px;color:var(--text)">${escapeHtml(master)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">
+            нараховано за період: <b style="color:var(--text2)">${Math.round(earned).toLocaleString()} грн</b>
+          </div>
+          <div style="font-size:11px;color:var(--text3)">
+            виплачено за період: <b style="color:#27c47a">${Math.round(paidInPeriod).toLocaleString()} грн</b>
+          </div>
+          <div style="font-size:11px;color:var(--text3)">
+            всього виплачено: <b style="color:#27c47a">${Math.round(totalPaid).toLocaleString()} грн</b>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:14px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '}${Math.abs(debt).toLocaleString()} грн</div>
+          <div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end">
+            <input type="number" placeholder="сума" min="0"
+              style="width:80px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px"
+              id="sal-pay-${escapeHtml(master)}">
+            <button class="btn-p sm" style="font-size:11px;padding:4px 8px"
+              onclick="addSalaryPayment('${escapeHtml(master)}')">+ Виплатити</button>
+          </div>
         </div>
       </div>
+      ${periodPayments.length ? `
+      <div style="border-top:1px solid var(--border);padding-top:6px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px">
+          Виплати за період:
+        </div>
+        ${periodPayments.map(p => `
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bg4)">
+            <span style="color:var(--text3)">${escapeHtml(p.date ? new Date(p.date).toLocaleString('uk-UA', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')}</span>
+            <b style="color:#27c47a;white-space:nowrap">+${(p.amount||0).toLocaleString()} грн</b>
+          </div>`).join('')}
+      </div>` : ''}
     </div>`;
   }).join('') || '<div style="color:var(--text3);font-size:13px">Немає даних за цей період</div>';
 }
@@ -2574,15 +2613,22 @@ function renderMasterSalaries(from, to) {
 function addSalaryPayment(master) {
   const inp = document.getElementById('sal-pay-' + master);
   const amount = parseFloat(inp?.value) || 0;
-  if (!amount) return;
-  const payments = JSON.parse(localStorage.getItem('bg_salary_payments') || '{}');
-  payments[master] = (payments[master] || 0) + amount;
-  localStorage.setItem('bg_salary_payments', JSON.stringify(payments));
+  if (!amount) { toast('Введіть суму', 'error'); return; }
+
+  const allPayments = JSON.parse(localStorage.getItem('bg_salary_payments_v2') || '{}');
+  if (!allPayments[master]) allPayments[master] = [];
+
+  allPayments[master].push({
+    date:   new Date().toISOString(),
+    amount: Math.round(amount),
+  });
+
+  localStorage.setItem('bg_salary_payments_v2', JSON.stringify(allPayments));
   inp.value = '';
   const from = document.getElementById('stat-from').value;
   const to   = document.getElementById('stat-to').value;
   renderMasterSalaries(from, to);
-  toast('Виплату враховано', 'success');
+  toast(`Виплачено ${Math.round(amount).toLocaleString()} грн → ${master}`, 'success');
 }
 
 // ============================================================
@@ -3173,6 +3219,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-45</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-46</div>
 </body>
 </html>
