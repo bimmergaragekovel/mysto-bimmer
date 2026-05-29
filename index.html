@@ -249,6 +249,38 @@ a{color:inherit;text-decoration:none}
 .pst-row span:nth-child(3){color:var(--text3)}
 .pst-row span:nth-child(4){color:var(--green2);font-weight:700}
 
+/* ===================== STOCK TRACKER ===================== */
+.stock-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.stock-bar-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:11px 14px}
+.stock-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;gap:8px;flex-wrap:wrap}
+.stock-name{font-size:13px;font-weight:700;color:#e8e8e8;flex:1}
+.stock-vals{font-size:12px;color:var(--text3);white-space:nowrap}
+.stock-vals b{color:var(--text)}
+.bar-track{height:7px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-bottom:4px}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.bar-green{background:linear-gradient(90deg,#1a7a4a,#27c47a)}
+.bar-amber{background:linear-gradient(90deg,#8a5a00,#ef9f27)}
+.bar-red{background:linear-gradient(90deg,#7a1a1a,#e05050)}
+.stock-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text4)}
+.stock-warn{color:#e05050;font-weight:700}
+.stock-ok{color:#27c47a}
+.stock-critical{color:#e05050;font-weight:800;animation:pulse .8s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:.5}}
+/* Stock settings item */
+.stock-item-row{background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius);margin-bottom:6px;overflow:hidden}
+.stock-item-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none}
+.stock-item-head:hover{background:rgba(255,255,255,.02)}
+.stock-item-name{flex:1;font-weight:700;font-size:13px}
+.stock-item-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.sib-ok{background:rgba(39,196,122,.12);color:#27c47a;border:1px solid rgba(39,196,122,.25)}
+.sib-warn{background:rgba(239,159,39,.12);color:#ef9f27;border:1px solid rgba(239,159,39,.25)}
+.sib-low{background:rgba(224,80,80,.12);color:#e05050;border:1px solid rgba(224,80,80,.25)}
+.stock-item-body{display:none;padding:0 12px 12px}
+.stock-item-row.open .stock-item-body{display:block}
+.stock-item-row.open .stock-item-chevron{transform:rotate(180deg)}
+.stock-item-chevron{width:14px;height:14px;fill:none;stroke:var(--text4);stroke-width:2.5;transition:transform .2s;flex-shrink:0}
+.stock-add-box{border:1px dashed var(--border2);border-radius:var(--radius);padding:12px;margin-top:8px}
+
 /* ===================== SETTINGS ===================== */
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:640px){.settings-grid{grid-template-columns:1fr}}
@@ -485,6 +517,8 @@ a{color:inherit;text-decoration:none}
 
   <!-- REPAIRS TAB -->
   <div class="main" id="repairs-tab">
+    <!-- Індикатори залишків -->
+    <div id="stock-indicators"></div>
     <div class="filter-row">
       <input class="search" type="text" placeholder="Пошук по авто, клієнту, VIN..." id="search-input" oninput="renderRepairs()">
       <div class="filter-btns">
@@ -568,8 +602,37 @@ a{color:inherit;text-decoration:none}
           <button class="btn-p sm" onclick="addSupplier()">+ Додати</button>
         </div>
       </div>
-      <!-- Запчастини -->
+      <!-- Відстеження залишків -->
       <div class="settings-panel full">
+        <div class="sp-title">Відстеження залишків товарів</div>
+        <div id="stock-settings-list"></div>
+        <div class="stock-add-box">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:10px">Додати товар для відстеження</div>
+          <div class="fl" style="margin-bottom:8px"><label>Назва (для відображення)</label>
+            <input type="text" id="new-stock-label" placeholder="напр. Aral 5W-40">
+          </div>
+          <div class="fl" style="margin-bottom:8px"><label>Пошукова фраза (у назві товару в ремонтах)</label>
+            <input type="text" id="new-stock-search" placeholder="напр. Aral 5w40">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+            <div class="fl"><label>Загальний об'єм</label>
+              <input type="number" id="new-stock-total" placeholder="60" min="0.1" step="0.1">
+            </div>
+            <div class="fl"><label>Поріг ⚠</label>
+              <input type="number" id="new-stock-thresh" placeholder="10" min="0" step="0.1">
+            </div>
+            <div class="fl"><label>Одиниця</label>
+              <select id="new-stock-unit">
+                <option value="л">л</option>
+                <option value="шт">шт</option>
+                <option value="кг">кг</option>
+                <option value="м">м</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-p sm" style="width:100%" onclick="addStockTracker()">+ Додати</button>
+        </div>
+      </div>
         <div class="sp-title">Каталог запчастин</div>
         <div id="parts-list"></div>
         <div class="cat-add-box">
@@ -911,6 +974,7 @@ function applyData(data) {
   if (data.works)     state.works     = data.works;
   if (data.codings)   state.codings   = data.codings;
   if (data.users)     state.users     = data.users || [];
+  renderStockIndicators();
 }
 
 // Часткові перезавантаження через один initData запит
@@ -1963,15 +2027,15 @@ async function saveRepair() {
   closeModal('repair-modal');
   toast('Ремонт збережено', 'success');
 
-  // Зберігаємо і оновлюємо з сервера
-  console.log('Saving repair:', JSON.stringify({
-    id: repair.id,
-    works: repair.works,
-    codings: repair.codings,
-    worksTotal: repair.worksTotal
-  }));
+  // Якщо статистика відкрита і обраний цей ремонт — оновлюємо аналіз одразу
+  if (document.getElementById('stats-tab')?.style.display !== 'none') {
+    const selId = document.getElementById('stat-repair-sel')?.value;
+    if (selId && String(selId) === String(repair.id)) {
+      renderRepairAnalysis();
+    }
+  }
+
   api({ action: 'saveRepair', repair }).then(async res => {
-    console.log('Server response:', JSON.stringify(res));
     if (!res.ok) {
       toast(res.error || 'Помилка збереження', 'error');
     } else {
@@ -1983,11 +2047,14 @@ async function saveRepair() {
           applyData(fresh);
           saveCache(fresh);
           renderRepairs();
-          // Оновлюємо борги постачальників якщо відкрита статистика
+          // Оновлюємо статистику якщо відкрита
           if (document.getElementById('stats-tab')?.style.display !== 'none') {
             renderStats();
+            // Якщо обраний ремонт у аналізі — оновлюємо і його
+            if (document.getElementById('stat-repair-sel')?.value) {
+              renderRepairAnalysis();
+            }
           } else {
-            // Оновлюємо в фоні щоб дані були актуальні при наступному відкритті
             renderSupplierDebts();
           }
         }
@@ -2632,6 +2699,229 @@ function addSalaryPayment(master) {
 }
 
 // ============================================================
+// STOCK TRACKER — кумулятивна логіка
+// ============================================================
+function getStockTrackers() {
+  return JSON.parse(localStorage.getItem('bg_stock_trackers') || '[]');
+}
+function saveStockTrackers(list) {
+  localStorage.setItem('bg_stock_trackers', JSON.stringify(list));
+}
+
+function calcStockUsed(searchPhrase, unit) {
+  let used = 0;
+  const q = searchPhrase.toLowerCase();
+  state.repairs.forEach(j => {
+    (j.parts||[]).forEach(p => {
+      if ((p.name||'').toLowerCase().includes(q) && (p.unit||'') === unit) {
+        used += parseFloat(p.qty) || 0;
+      }
+    });
+  });
+  return Math.round(used * 100) / 100;
+}
+
+function calcStockReceived(batches) {
+  return Math.round(((batches)||[]).reduce((s,b) => s+(b.amount||0), 0) * 100) / 100;
+}
+
+function renderStockIndicators() {
+  const el = document.getElementById('stock-indicators');
+  if (!el) return;
+  const trackers = getStockTrackers();
+  if (!trackers.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="stock-list">' +
+    trackers.map(t => {
+      const received  = calcStockReceived(t.batches);
+      const used      = calcStockUsed(t.search, t.unit);
+      const remaining = Math.round((received - used) * 100) / 100;
+      const pct       = received > 0 ? Math.max(0, Math.min(100, Math.round(remaining / received * 100))) : 0;
+      const barClass  = pct > 30 ? 'bar-green' : pct > 15 ? 'bar-amber' : 'bar-red';
+      const isCrit    = remaining <= 0;
+      const isWarn    = !isCrit && remaining <= (t.threshold || 0);
+      const statusHtml = isCrit
+        ? '<span class="stock-critical">\uD83D\uDD34 Закінчилось!</span>'
+        : isWarn
+          ? '<span class="stock-warn">\u26A0 Мало! Замови нову партію</span>'
+          : '<span class="stock-ok">\u2713 В нормі</span>';
+      return '<div class="stock-bar-wrap">' +
+        '<div class="stock-bar-top">' +
+          '<span class="stock-name">\uD83D\uDEE2 ' + escapeHtml(t.label) + '</span>' +
+          '<span class="stock-vals"><b>' + Math.max(0,remaining) + '</b> / ' + received + ' ' + escapeHtml(t.unit) + '</span>' +
+        '</div>' +
+        '<div class="bar-track"><div class="bar-fill ' + barClass + '" style="width:' + pct + '%"></div></div>' +
+        '<div class="stock-footer">' +
+          '<span>Витрачено: ' + used + ' ' + escapeHtml(t.unit) + '</span>' +
+          statusHtml +
+        '</div></div>';
+    }).join('') + '</div>';
+}
+
+function renderStockSettings() {
+  const el = document.getElementById('stock-settings-list');
+  if (!el) return;
+  const trackers = getStockTrackers();
+  if (!trackers.length) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:13px;margin-bottom:8px">Немає позицій. Додай перший товар нижче.</div>';
+    return;
+  }
+  el.innerHTML = trackers.map((t, idx) => {
+    const received  = calcStockReceived(t.batches);
+    const used      = calcStockUsed(t.search, t.unit);
+    const remaining = Math.max(0, Math.round((received - used) * 100) / 100);
+    const pct       = received > 0 ? Math.round(remaining / received * 100) : 0;
+    const isCrit    = remaining <= 0;
+    const isWarn    = !isCrit && remaining <= (t.threshold || 0);
+    const badgeClass = isCrit ? 'sib-low' : isWarn ? 'sib-warn' : 'sib-ok';
+    const badgeText  = isCrit
+      ? (remaining + '/' + received + ' ' + t.unit + ' \uD83D\uDD34')
+      : isWarn
+        ? (remaining + '/' + received + ' ' + t.unit + ' \u26A0')
+        : (remaining + '/' + received + ' ' + t.unit);
+
+    const batchRows = (t.batches||[]).slice().reverse().map((b, bi) => {
+      const realIdx = (t.batches.length - 1 - bi);
+      const dateStr = b.date ? new Date(b.date).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'}) : '\u2014';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--bg4);font-size:12px">' +
+        '<span style="color:var(--text3);flex:1">' + escapeHtml(dateStr) + '</span>' +
+        '<b style="color:#27c47a">+' + b.amount + ' ' + escapeHtml(t.unit) + '</b>' +
+        '<button onclick="deleteStockBatch(' + idx + ',' + realIdx + ')" style="background:none;border:none;color:#444;cursor:pointer;font-size:14px;padding:0 4px">\u00D7</button>' +
+        '</div>';
+    }).join('');
+
+    const batchesHtml = (t.batches||[]).length
+      ? '<div style="margin-bottom:8px">' +
+          '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px">Партії надходжень:</div>' +
+          batchRows +
+        '</div>'
+      : '<div style="color:var(--text3);font-size:12px;margin-bottom:8px">Партій ще немає</div>';
+
+    return '<div class="stock-item-row" id="stock-row-' + idx + '">' +
+      '<div class="stock-item-head" onclick="toggleStockItem(' + idx + ')">' +
+        '<span class="stock-item-name">' + escapeHtml(t.label) + '</span>' +
+        '<span class="stock-item-badge ' + badgeClass + '">' + escapeHtml(badgeText) + '</span>' +
+        '<svg class="stock-item-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+      '<div class="stock-item-body">' +
+        '<div style="font-size:12px;color:var(--text3);margin-bottom:10px;padding:8px;background:var(--bg);border-radius:6px">' +
+          'Надійшло всього: <b style="color:#4d9fd6">' + received + ' ' + escapeHtml(t.unit) + '</b> \u00B7 ' +
+          'Витрачено: <b style="color:#ef9f27">' + used + ' ' + escapeHtml(t.unit) + '</b> \u00B7 ' +
+          'Залишок: <b style="color:' + (isCrit?'#e05050':isWarn?'#ef9f27':'#27c47a') + '">' + remaining + ' ' + escapeHtml(t.unit) + ' (' + pct + '%)</b>' +
+        '</div>' +
+        batchesHtml +
+        '<div style="display:flex;gap:6px;margin-bottom:10px;align-items:flex-end">' +
+          '<div class="fl" style="flex:1"><label>+ Нова партія (' + escapeHtml(t.unit) + ')</label>' +
+            '<input type="number" id="stock-batch-' + idx + '" placeholder="\u043d\u0430\u043f\u0440. 60" min="0.1" step="0.1">' +
+          '</div>' +
+          '<button class="btn-p sm" style="flex-shrink:0" onclick="addStockBatch(' + idx + ')">+ Партія</button>' +
+        '</div>' +
+        '<div style="border-top:1px solid var(--border);padding-top:10px">' +
+          '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:8px">Налаштування</div>' +
+          '<div class="fl" style="margin-bottom:8px"><label>Назва (відображення)</label>' +
+            '<input type="text" id="stock-label-' + idx + '" value="' + escapeHtml(t.label) + '">' +
+          '</div>' +
+          '<div class="fl" style="margin-bottom:8px"><label>Пошукова фраза в назві товару в ремонтах</label>' +
+            '<input type="text" id="stock-search-' + idx + '" value="' + escapeHtml(t.search) + '">' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
+            '<div class="fl"><label>Поріг попередження (' + escapeHtml(t.unit) + ')</label>' +
+              '<input type="number" id="stock-thresh-' + idx + '" value="' + (t.threshold||0) + '" min="0" step="0.1">' +
+            '</div>' +
+            '<div class="fl"><label>Одиниця</label>' +
+              '<select id="stock-unit-' + idx + '">' +
+                '<option value="\u043b"' + (t.unit==='\u043b'?' selected':'') + '>\u043b</option>' +
+                '<option value="\u0448\u0442"' + (t.unit==='\u0448\u0442'?' selected':'') + '>\u0448\u0442</option>' +
+                '<option value="\u043a\u0433"' + (t.unit==='\u043a\u0433'?' selected':'') + '>\u043a\u0433</option>' +
+                '<option value="\u043c"' + (t.unit==='\u043c'?' selected':'') + '>\u043c</option>' +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;justify-content:flex-end">' +
+            '<button class="btn-d" onclick="deleteStockTracker(' + idx + ')">Видалити товар</button>' +
+            '<button class="btn-p sm" onclick="saveStockTracker(' + idx + ')">Зберегти</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleStockItem(idx) {
+  const row = document.getElementById('stock-row-' + idx);
+  if (row) row.classList.toggle('open');
+}
+
+function addStockBatch(idx) {
+  const inp    = document.getElementById('stock-batch-' + idx);
+  const amount = parseFloat(inp ? inp.value : '') || 0;
+  if (!amount) { toast('Введи кількість', 'error'); return; }
+  const list = getStockTrackers();
+  if (!list[idx]) return;
+  if (!list[idx].batches) list[idx].batches = [];
+  list[idx].batches.push({ date: new Date().toISOString(), amount: Math.round(amount * 100) / 100 });
+  saveStockTrackers(list);
+  if (inp) inp.value = '';
+  renderStockSettings();
+  renderStockIndicators();
+  toast('+' + amount + ' ' + list[idx].unit + ' додано до ' + list[idx].label, 'success');
+}
+
+function deleteStockBatch(trackerIdx, batchIdx) {
+  if (!confirm('Видалити цю партію?')) return;
+  const list = getStockTrackers();
+  if (!list[trackerIdx] || !list[trackerIdx].batches) return;
+  list[trackerIdx].batches.splice(batchIdx, 1);
+  saveStockTrackers(list);
+  renderStockSettings();
+  renderStockIndicators();
+  toast('Партію видалено', 'success');
+}
+
+function addStockTracker() {
+  const label  = (document.getElementById('new-stock-label') || {}).value;
+  const search = (document.getElementById('new-stock-search') || {}).value;
+  const thresh = parseFloat((document.getElementById('new-stock-thresh') || {}).value) || 0;
+  const unit   = (document.getElementById('new-stock-unit') || {}).value || '\u043b';
+  if (!label || !label.trim() || !search || !search.trim()) { toast('Заповни назву і пошукову фразу', 'error'); return; }
+  const list = getStockTrackers();
+  list.push({ label: label.trim(), search: search.trim(), threshold: thresh, unit, batches: [] });
+  saveStockTrackers(list);
+  ['new-stock-label','new-stock-search','new-stock-thresh'].forEach(function(id) {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  renderStockSettings();
+  renderStockIndicators();
+  toast('\u0414\u043e\u0434\u0430\u043d\u043e: ' + label.trim() + '. \u0422\u0435\u043f\u0435\u0440 \u0434\u043e\u0434\u0430\u0439 \u043f\u0435\u0440\u0448\u0443 \u043f\u0430\u0440\u0442\u0456\u044e.', 'success');
+}
+
+function saveStockTracker(idx) {
+  const list = getStockTrackers();
+  if (!list[idx]) return;
+  const labelEl  = document.getElementById('stock-label-'  + idx);
+  const searchEl = document.getElementById('stock-search-' + idx);
+  const threshEl = document.getElementById('stock-thresh-' + idx);
+  const unitEl   = document.getElementById('stock-unit-'   + idx);
+  if (labelEl  && labelEl.value.trim())  list[idx].label     = labelEl.value.trim();
+  if (searchEl && searchEl.value.trim()) list[idx].search    = searchEl.value.trim();
+  if (threshEl) list[idx].threshold = parseFloat(threshEl.value) || 0;
+  if (unitEl)   list[idx].unit      = unitEl.value || list[idx].unit;
+  saveStockTrackers(list);
+  renderStockSettings();
+  renderStockIndicators();
+  toast('Збережено', 'success');
+}
+
+function deleteStockTracker(idx) {
+  if (!confirm('Видалити цей товар зі списку відстеження?')) return;
+  const list = getStockTrackers();
+  list.splice(idx, 1);
+  saveStockTrackers(list);
+  renderStockSettings();
+  renderStockIndicators();
+  toast('Видалено', 'success');
+}
+
+// ============================================================
 // SETTINGS
 // ============================================================
 function renderSettings() {
@@ -2639,6 +2929,7 @@ function renderSettings() {
   renderPartsCatalog();
   renderWorksCatalog();
   renderCodingsCatalog();
+  renderStockSettings();
   if (state.role === 'admin') renderUsers();
   document.getElementById('users-panel').style.display = state.role === 'admin' ? '' : 'none';
 }
@@ -3219,6 +3510,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-46</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.05.26-49</div>
 </body>
 </html>
