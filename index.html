@@ -811,7 +811,7 @@ a{color:inherit;text-decoration:none}
         </div>
         <div class="part-add-grid2">
           <div class="fl"><label>Кількість</label><input type="number" id="p-qty" value="1" min="0.01" step="0.1"></div>
-          <div class="fl"><label>Одиниця</label><input type="text" id="p-unit-disp" readonly style="background:var(--bg);color:var(--text3)"></div>
+          <div class="fl"><label>Одиниця</label><select id="p-unit-disp"><option value="шт">шт</option><option value="л">л</option><option value="кг">кг</option><option value="м">м</option></select></div>
           <div class="fl"><label>Постачальник</label><select id="p-supplier"></select></div>
           <div class="fl admin-only"><label>Прих. ціна (грн)</label><input type="number" id="p-cost" placeholder="0" min="0" oninput="calcPartSale()"></div>
           <div class="fl admin-only"><label>Тип націнки</label>
@@ -975,16 +975,16 @@ function loadCache() {
   } catch(e) { return null; }
 }
 function applyData(data) {
-  if (data.repairs)        state.repairs        = data.repairs;
-  if (data.suppliers)      state.suppliers      = data.suppliers;
-  if (data.parts)          state.parts          = data.parts;
-  if (data.works)          state.works          = data.works;
-  if (data.codings)        state.codings        = data.codings;
-  if (data.users)          state.users          = data.users || [];
-  if (data.stockTrackers)  state.stockTrackers  = data.stockTrackers  || [];
-  if (data.stockBatches)   state.stockBatches   = data.stockBatches   || [];
-  if (data.supPayments)    state.supPayments    = data.supPayments    || [];
-  if (data.salaryPayments) state.salaryPayments = data.salaryPayments || [];
+  if (data.repairs        != null) state.repairs        = data.repairs;
+  if (data.suppliers      != null) state.suppliers      = data.suppliers;
+  if (data.parts          != null) state.parts          = data.parts;
+  if (data.works          != null) state.works          = data.works;
+  if (data.codings        != null) state.codings        = data.codings;
+  if (data.users          != null) state.users          = data.users          || [];
+  if (data.stockTrackers  != null) state.stockTrackers  = data.stockTrackers  || [];
+  if (data.stockBatches   != null) state.stockBatches   = data.stockBatches   || [];
+  if (data.supPayments    != null) state.supPayments    = data.supPayments    || [];
+  if (data.salaryPayments != null) state.salaryPayments = data.salaryPayments || [];
   renderStockIndicators();
 }
 
@@ -1727,9 +1727,9 @@ function onPartCatSelect() {
   const markup     = opt.dataset.markup || '';
   const markupType = opt.dataset.markuptype || 'pct';
 
-  document.getElementById('p-unit-disp').value = unit;
-  document.getElementById('p-qty').step = unit === 'шт' ? '1' : '0.1';
-  document.getElementById('p-qty').value = unit === 'шт' ? '1' : '1.0';
+  document.getElementById('p-unit-disp').value = unit || 'шт';
+  document.getElementById('p-qty').step = (unit === 'шт' || !unit) ? '1' : '0.1';
+  document.getElementById('p-qty').value = (unit === 'шт' || !unit) ? '1' : '1.0';
 
   if (state.role === 'admin') {
     document.getElementById('p-cost').value = cost;
@@ -1810,7 +1810,7 @@ function addFormPart() {
   // Очищуємо
   document.getElementById('p-cat-sel').value = '';
   document.getElementById('p-name-custom').value = '';
-  document.getElementById('p-unit-disp').value = '';
+  document.getElementById('p-unit-disp').value = 'шт';
   document.getElementById('p-cost').value = '';
   document.getElementById('p-markup').value = '';
   document.getElementById('p-sale').value = '';
@@ -2649,10 +2649,13 @@ function renderMasterSalaries(from, to) {
 // Рахує витрати з ВСІХ ремонтів
 function calcStockUsed(searchPhrase, unit) {
   let used = 0;
-  const q = searchPhrase.toLowerCase();
+  const q = searchPhrase.toLowerCase().trim();
+  const u = (unit||'').toLowerCase().trim();
   state.repairs.forEach(j => {
     (j.parts||[]).forEach(p => {
-      if ((p.name||'').toLowerCase().includes(q) && (p.unit||'') === unit) {
+      const pName = (p.name||'').toLowerCase();
+      const pUnit = (p.unit||'').toLowerCase().trim();
+      if (pName.includes(q) && pUnit === u) {
         used += parseFloat(p.qty) || 0;
       }
     });
