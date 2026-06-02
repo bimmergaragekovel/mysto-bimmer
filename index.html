@@ -2082,12 +2082,12 @@ async function sharePDF(id) {
   if (!j) return;
 
   // Розраховуємо суми правильно
-  const worksTotal   = (j.works   || []).reduce((s, w) => s + (w.retail || 0), 0);
-  const codingsTotal = (j.codings || []).reduce((s, c) => s + (c.retail || 0), 0);
-  const partsTotal   = (j.parts   || []).reduce((s, p) => s + (p.sale || 0) * (p.qty || 1), 0);
-  const grandTotal   = Math.round(worksTotal + codingsTotal + partsTotal);
-  const paid         = (j.payments || []).reduce((s, p) => s + (p.amount || 0), 0);
-  const debt         = Math.max(0, grandTotal - Math.round(paid));
+
+  const allServices = [
+    ...(j.works   || []).map(w => ({ name: w.name, sum: Math.round(w.retail || 0) })),
+    ...(j.codings || []).map(c => ({ name: c.name, sum: Math.round(c.retail || 0) })),
+  ];
+  const servicesTotal = Math.round(worksTotal + codingsTotal);
 
   const html = `<!DOCTYPE html>
 <html>
@@ -2096,120 +2096,103 @@ async function sharePDF(id) {
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Exo 2',Arial,sans-serif;background:#fff;color:#111;padding:20mm;font-size:12px;line-height:1.5}
-  .header{margin-bottom:8mm}
-  .brand{font-size:22px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#111}
-  .brand-sub{font-size:10px;color:#888;letter-spacing:.05em;margin-top:2px}
-  .red-line{border:none;border-top:2px solid #cc0000;margin:4mm 0}
-  .section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:5mm 0 3mm;color:#333;border-left:3px solid #cc0000;padding-left:4px}
-  .field-row{display:flex;margin-bottom:3mm}
-  .field-label{font-weight:700;min-width:35mm;color:#555;font-size:11px}
-  .field-val{color:#111;font-size:11px}
-  table{width:100%;border-collapse:collapse;margin-bottom:3mm}
-  th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;padding:2mm 0;border-bottom:1px solid #ddd}
-  td{padding:2.5mm 0;border-bottom:1px solid #f0f0f0;font-size:11px;vertical-align:middle}
-  td:last-child{text-align:right;font-weight:600}
-  .subtotal-row td{font-weight:700;color:#333;border-top:1px solid #ddd;border-bottom:none;padding-top:3mm}
-  .total-block{margin-top:4mm;padding-top:4mm;border-top:2px solid #cc0000}
-  .total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:2mm}
-  .total-label{font-size:12px;font-weight:700;color:#555}
-  .total-val{font-size:14px;font-weight:800;color:#111}
-  .grand-label{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
-  .grand-val{font-size:20px;font-weight:800;color:#cc0000}
-  .debt-val{font-size:16px;font-weight:800;color:#cc0000}
-  .paid-val{font-size:14px;font-weight:700;color:#228844}
-  .sign-row{display:flex;justify-content:space-between;margin-top:14mm;font-size:11px;color:#555}
-  .sign-line{display:inline-block;width:55mm;border-bottom:1px solid #999;margin-left:3mm}
-  .mstripe{display:flex;gap:2px;margin-top:2mm}
-  .mstripe span{display:block;height:3px;width:22px;border-radius:1px}
-  @media print{body{padding:15mm}@page{margin:0;size:A4}}
+  body{font-family:'Exo 2',Arial,sans-serif;background:#fff;color:#111;padding:11mm 13mm;font-size:10px;line-height:1.35}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3mm}
+  .brand{font-size:17px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+  .brand-sub{font-size:8px;color:#888;margin-top:1px}
+  .mstripe{display:flex;gap:2px;margin-top:2px}
+  .mstripe span{display:block;height:2px;width:14px;border-radius:1px}
+  .doc-meta{text-align:right;font-size:9px;color:#666;line-height:1.5}
+  .doc-title{font-size:12px;font-weight:800;color:#cc0000;letter-spacing:.04em}
+  .red-line{border:none;border-top:2px solid #cc0000;margin:2mm 0}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8mm;margin:2.5mm 0}
+  .field-row{display:flex;gap:2mm;margin-bottom:1mm;font-size:9px}
+  .field-label{font-weight:700;min-width:16mm;color:#777;flex-shrink:0}
+  .field-val{color:#111}
+  .note-row{font-size:8px;color:#888;margin:1mm 0;font-style:italic}
+  .section-title{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#cc0000;margin:2.5mm 0 1mm;padding-left:3px;border-left:2px solid #cc0000}
+  table{width:100%;border-collapse:collapse;margin-bottom:0}
+  th{text-align:left;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:.8mm 1.5mm;border-bottom:1px solid #ddd;background:#fafafa}
+  td{padding:.9mm 1.5mm;border-bottom:1px solid #f0f0f0;font-size:9px;vertical-align:middle}
+  td.r{text-align:right;font-weight:600;white-space:nowrap}
+  .sub td{font-weight:700;border-top:1.5px solid #bbb;border-bottom:none;background:#f5f5f5;font-size:9px}
+  .total-block{margin-top:2.5mm;padding:2mm 3mm;border:1.5px solid #ddd;border-radius:2px}
+  .t-row{display:flex;justify-content:space-between;align-items:center;padding:.7mm 0}
+  .t-label{font-size:9px;font-weight:600;color:#555}
+  .t-val{font-size:9.5px;font-weight:700;color:#111}
+  .grand-row{display:flex;justify-content:space-between;align-items:center;padding:1.5mm 0 0;margin-top:1mm;border-top:2px solid #cc0000}
+  .grand-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+  .grand-val{font-size:15px;font-weight:800;color:#cc0000}
+  .debt-val{font-size:12px;font-weight:800;color:#cc0000}
+  .sign-row{display:flex;justify-content:space-between;margin-top:7mm;font-size:9px;color:#555}
+  .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
+  @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
 </style>
 </head>
 <body>
   <div class="header">
-    <div class="brand">BimmerGarage</div>
-    <div class="brand-sub">СТО · вул. Левицького 115А, Ковель · +380 99 528 10 10 · bimmergarage.com.ua</div>
-    <div class="mstripe">
-      <span style="background:#0057b8"></span>
-      <span style="background:#cc0000"></span>
-      <span style="background:#0057b8"></span>
+    <div>
+      <div class="brand">BimmerGarage</div>
+      <div class="brand-sub">СТО · вул. Левицького 115А, Ковель · +380 99 528 10 10 · bimmergarage.com.ua</div>
+      <div class="mstripe">
+        <span style="background:#0057b8"></span><span style="background:#cc0000"></span><span style="background:#0057b8"></span>
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">НАРЯД-ЗАМОВЛЕННЯ</div>
+      <div>${escapeHtml(j.date || '—')}</div>
+      ${j.status === 'done' ? '<div style="color:#228844;font-weight:700">✓ ЗАВЕРШЕНИЙ</div>' : '<div style="color:#e08800;font-weight:700">⏳ В РОБОТІ</div>'}
     </div>
   </div>
   <hr class="red-line">
 
-  <div class="section-title">Наряд-замовлення</div>
-  <div class="field-row"><span class="field-label">Авто:</span><span class="field-val"><b>${escapeHtml(j.car)}</b>${j.vin ? ' / ' + escapeHtml(j.vin) : ''}</span></div>
-  <div class="field-row"><span class="field-label">Клієнт:</span><span class="field-val">${escapeHtml(j.client || '—')}</span></div>
-  <div class="field-row"><span class="field-label">Телефон:</span><span class="field-val">${escapeHtml(j.phone || '—')}</span></div>
-  <div class="field-row"><span class="field-label">Дата:</span><span class="field-val">${escapeHtml(j.date || '—')}</span></div>
-  <div class="field-row"><span class="field-label">Статус:</span><span class="field-val">${j.status === 'done' ? '✓ Завершений' : '⏳ В роботі'}</span></div>
-  ${j.notes ? `<div class="field-row"><span class="field-label">Нотатки:</span><span class="field-val">${escapeHtml(j.notes)}</span></div>` : ''}
+  <div class="info-grid">
+    <div>
+      <div class="field-row"><span class="field-label">Авто:</span><span class="field-val"><b>${escapeHtml(j.car)}</b>${j.vin ? ' / ' + escapeHtml(j.vin) : ''}</span></div>
+      <div class="field-row"><span class="field-label">Клієнт:</span><span class="field-val">${escapeHtml(j.client || '—')}</span></div>
+    </div>
+    <div>
+      <div class="field-row"><span class="field-label">Телефон:</span><span class="field-val">${escapeHtml(j.phone || '—')}</span></div>
+      ${j.master ? `<div class="field-row"><span class="field-label">Майстер:</span><span class="field-val">${escapeHtml(j.master)}</span></div>` : ''}
+    </div>
+  </div>
+  ${j.notes ? `<div class="note-row">Нотатки: ${escapeHtml(j.notes)}</div>` : ''}
 
-  ${(j.works && j.works.length) ? `
-  <div class="section-title">Виконані роботи</div>
+  ${allServices.length ? `
+  <div class="section-title">Роботи та кодування</div>
   <table>
-    <thead><tr><th>Вид роботи</th><th style="text-align:right">Сума</th></tr></thead>
+    <thead><tr><th>Вид роботи / кодування</th><th style="text-align:right">Сума</th></tr></thead>
     <tbody>
-      ${j.works.map(w => `<tr>
-        <td>${escapeHtml(w.name)}</td>
-        <td>${Math.round(w.retail || 0).toLocaleString()} грн</td>
-      </tr>`).join('')}
-      <tr class="subtotal-row">
-        <td>Разом роботи:</td>
-        <td>${Math.round(worksTotal).toLocaleString()} грн</td>
-      </tr>
-    </tbody>
-  </table>` : ''}
-
-  ${(j.codings && j.codings.length) ? `
-  <div class="section-title">Кодування</div>
-  <table>
-    <thead><tr><th>Вид кодування</th><th style="text-align:right">Сума</th></tr></thead>
-    <tbody>
-      ${j.codings.map(c => `<tr>
-        <td>${escapeHtml(c.name)}</td>
-        <td>${Math.round(c.retail || 0).toLocaleString()} грн</td>
-      </tr>`).join('')}
-      <tr class="subtotal-row">
-        <td>Разом кодування:</td>
-        <td>${Math.round(codingsTotal).toLocaleString()} грн</td>
-      </tr>
+      ${allServices.map(s => `<tr><td>${escapeHtml(s.name)}</td><td class="r">${s.sum.toLocaleString()} грн</td></tr>`).join('')}
+      <tr class="sub"><td>Разом роботи:</td><td class="r">${servicesTotal.toLocaleString()} грн</td></tr>
     </tbody>
   </table>` : ''}
 
   ${(j.parts && j.parts.length) ? `
   <div class="section-title">Запчастини та матеріали</div>
   <table>
-    <thead><tr><th>Назва</th><th>К-ть</th><th style="text-align:right">Ціна</th></tr></thead>
+    <thead><tr><th style="width:58%">Назва</th><th style="width:17%">К-ть</th><th style="text-align:right;width:25%">Сума</th></tr></thead>
     <tbody>
-      ${j.parts.map(p => `<tr>
-        <td>${escapeHtml(p.name)}</td>
-        <td>${fmtNum(p.qty)} ${escapeHtml(p.unit || 'шт')}</td>
-        <td>${Math.round((p.sale || 0) * (p.qty || 1)).toLocaleString()} грн</td>
-      </tr>`).join('')}
-      <tr class="subtotal-row">
-        <td>Разом запчастини:</td>
-        <td>${Math.round(partsTotal).toLocaleString()} грн</td>
-      </tr>
+      ${j.parts.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${fmtNum(p.qty)} ${escapeHtml(p.unit||'шт')}</td><td class="r">${Math.round((p.sale||0)*(p.qty||1)).toLocaleString()} грн</td></tr>`).join('')}
+      <tr class="sub"><td colspan="2">Разом запчастини:</td><td class="r">${Math.round(partsTotal).toLocaleString()} грн</td></tr>
     </tbody>
   </table>` : ''}
 
   <hr class="red-line">
   <div class="total-block">
-    ${worksTotal > 0 ? `<div class="total-row"><span class="total-label">Роботи:</span><span class="total-val">${Math.round(worksTotal).toLocaleString()} грн</span></div>` : ''}
-    ${codingsTotal > 0 ? `<div class="total-row"><span class="total-label">Кодування:</span><span class="total-val">${Math.round(codingsTotal).toLocaleString()} грн</span></div>` : ''}
-    ${partsTotal > 0 ? `<div class="total-row"><span class="total-label">Запчастини:</span><span class="total-val">${Math.round(partsTotal).toLocaleString()} грн</span></div>` : ''}
-    <div class="total-row" style="margin-top:3mm;padding-top:3mm;border-top:1px solid #ddd">
+    ${servicesTotal > 0 ? `<div class="t-row"><span class="t-label">Роботи та кодування:</span><span class="t-val">${servicesTotal.toLocaleString()} грн</span></div>` : ''}
+    ${partsTotal > 0 ? `<div class="t-row"><span class="t-label">Запчастини:</span><span class="t-val">${Math.round(partsTotal).toLocaleString()} грн</span></div>` : ''}
+    <div class="grand-row">
       <span class="grand-label">Разом до сплати:</span>
       <span class="grand-val">${grandTotal.toLocaleString()} грн</span>
     </div>
     ${paid > 0 ? `
-    <div class="total-row">
-      <span class="total-label">Сплачено:</span>
-      <span class="paid-val">${Math.round(paid).toLocaleString()} грн</span>
+    <div class="t-row" style="padding-top:1mm;margin-top:1mm;border-top:1px solid #ddd">
+      <span class="t-label">Сплачено:</span>
+      <span style="font-weight:700;color:#228844">${Math.round(paid).toLocaleString()} грн</span>
     </div>
-    <div class="total-row">
-      <span class="grand-label">Залишок боргу:</span>
+    <div class="t-row">
+      <span class="t-label">Залишок боргу:</span>
       <span class="debt-val">${debt.toLocaleString()} грн</span>
     </div>` : ''}
   </div>
