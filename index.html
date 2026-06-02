@@ -2081,7 +2081,12 @@ async function sharePDF(id) {
   const j = state.repairs.find(r => r.id == id);
   if (!j) return;
 
-  // Розраховуємо суми правильно
+  const worksTotal   = (j.works   || []).reduce((s, w) => s + (w.retail || 0), 0);
+  const codingsTotal = (j.codings || []).reduce((s, c) => s + (c.retail || 0), 0);
+  const partsTotal   = (j.parts   || []).reduce((s, p) => s + (p.sale || 0) * (p.qty || 1), 0);
+  const grandTotal   = Math.round(worksTotal + codingsTotal + partsTotal);
+  const paid         = (j.payments || []).reduce((s, p) => s + (p.amount || 0), 0);
+  const debt         = Math.max(0, grandTotal - Math.round(paid));
 
   const allServices = [
     ...(j.works   || []).map(w => ({ name: w.name, sum: Math.round(w.retail || 0) })),
