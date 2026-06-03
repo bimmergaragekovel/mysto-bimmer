@@ -351,6 +351,7 @@ a{color:inherit;text-decoration:none}
 .role-admin{background:rgba(200,0,0,.12);color:var(--red2);border:1px solid rgba(200,0,0,.2)}
 .role-master{background:rgba(0,87,184,.12);color:#4d9fd6;border:1px solid rgba(0,87,184,.2)}
 .role-viewer{background:rgba(26,122,74,.1);color:var(--green2);border:1px solid rgba(26,122,74,.2)}
+.role-coder{background:rgba(192,80,192,.1);color:#d070d0;border:1px solid rgba(192,80,192,.2)}
 
 /* ===================== PAYMENTS ===================== */
 .pay-block{margin-top:10px;padding-top:10px;border-top:1px solid #1e1e1e}
@@ -637,6 +638,10 @@ a{color:inherit;text-decoration:none}
       <div class="stat-panel-title" style="color:#EF9F27">Зарплати майстрів (за період)</div>
       <div id="stat-master-salaries"></div>
     </div>
+    <div class="stat-panel" style="margin-top:12px">
+      <div class="stat-panel-title" style="color:#d070d0">Виплати кодувальникам (за період)</div>
+      <div id="stat-coder-salaries"></div>
+    </div>
   </div>
 
   <!-- SETTINGS TAB -->
@@ -741,6 +746,15 @@ a{color:inherit;text-decoration:none}
           </div>
         </div>
       </div>
+      <!-- Кодувальник за замовчуванням -->
+      <div class="settings-panel full" id="default-coder-panel">
+        <div class="sp-title">Кодувальник за замовчуванням</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <select id="default-coder-sel" style="flex:1;max-width:300px"><option value="">— не обрано —</option></select>
+          <button class="btn-p sm" onclick="saveDefaultCoder()">Зберегти</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">Обраний кодувальник автоматично підставляється у нові ремонти</div>
+      </div>
       <!-- Користувачі -->
       <div class="settings-panel full" id="users-panel">
         <div class="sp-title">Користувачі</div>
@@ -750,6 +764,7 @@ a{color:inherit;text-decoration:none}
           <input type="password" id="new-user-pass" placeholder="Пароль" style="flex:1;min-width:100px">
           <select id="new-user-role" style="width:130px">
             <option value="master">Майстер</option>
+            <option value="coder">Кодувальник</option>
             <option value="viewer">Перегляд</option>
             <option value="admin">Admin</option>
           </select>
@@ -830,6 +845,13 @@ a{color:inherit;text-decoration:none}
 
       <!-- TAB: CODING -->
       <div class="form-tab-body ftb-coding" id="ftb-coding">
+        <div style="margin-bottom:10px">
+          <div class="fl"><label>Кодувальник</label>
+            <select id="f-coder-sel">
+              <option value="">— не обрано —</option>
+            </select>
+          </div>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div class="fl fw"><label>З каталогу</label>
             <select id="f-coding-sel" onchange="onCodingSelChange()">
@@ -919,8 +941,10 @@ let state = {
   users: [],
   stockTrackers:  [],
   stockBatches:   [],
-  supPayments:    [],
-  salaryPayments: [],
+  supPayments:       [],
+  salaryPayments:    [],
+  coderPayments:     [],
+  config:            {},
   filter: 'all',
   editId: null,
   formParts: [],
@@ -1039,7 +1063,9 @@ function applyData(data) {
   if (data.stockTrackers  != null) state.stockTrackers  = data.stockTrackers  || [];
   if (data.stockBatches   != null) state.stockBatches   = data.stockBatches   || [];
   if (data.supPayments    != null) state.supPayments    = data.supPayments    || [];
-  if (data.salaryPayments != null) state.salaryPayments = data.salaryPayments || [];
+  if (data.salaryPayments  != null) state.salaryPayments  = data.salaryPayments  || [];
+  if (data.coderPayments   != null) state.coderPayments   = data.coderPayments   || [];
+  if (data.config          != null) state.config          = data.config          || {};
   renderStockIndicators();
 }
 
@@ -1067,7 +1093,7 @@ async function initApp() {
 
   if (role === 'admin' || role === 'viewer') { showEl('tab-stats'); showEl('tab-stats-m'); }
   if (role === 'admin') { showEl('tab-settings'); showEl('tab-settings-m'); showEl('btn-add-repair'); }
-  if (role === 'master') showEl('btn-add-repair');
+  if (role === 'master' || role === 'coder') showEl('btn-add-repair');
 
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = role === 'admin' ? '' : 'none';
@@ -1095,7 +1121,7 @@ async function initApp() {
 }
 
 function roleLabel(r) {
-  return {admin:'Адмін', master:'Майстер', viewer:'Перегляд'}[r] || r;
+  return {admin:'Адмін', master:'Майстер', viewer:'Перегляд', coder:'Кодувальник'}[r] || r;
 }
 
 // ============================================================
@@ -1495,6 +1521,14 @@ function openRepairModal(id = null) {
       masters.map(u => `<option value="${escapeHtml(u.login)}">${escapeHtml(u.login)}</option>`).join('');
   }
 
+  // Список кодувальників
+  const coderSel = document.getElementById('f-coder-sel');
+  if (coderSel) {
+    const coders = state.users.filter(u => u.role === 'coder');
+    coderSel.innerHTML = '<option value="">— не обрано —</option>' +
+      coders.map(u => `<option value="${escapeHtml(u.login)}">${escapeHtml(u.login)}</option>`).join('');
+  }
+
   if (id) {
     const j = state.repairs.find(r => r.id == id);
     if (j) {
@@ -1507,6 +1541,7 @@ function openRepairModal(id = null) {
       document.getElementById('f-status').value   = j.status || 'open';
       document.getElementById('f-notes').value    = j.notes || '';
       if (masterSel) masterSel.value = j.master || '';
+      if (coderSel) coderSel.value = j.coder || '';
       state.formWorks   = (j.works   || []).map(w => ({ ...w, id: w.id || Date.now() + Math.random() }));
       state.formCodings = (j.codings || []).map(c => ({ ...c, id: c.id || Date.now() + Math.random() }));
       state.formParts   = (j.parts   || []).map(p => ({ ...p, id: p.id || Date.now() + Math.random() }));
@@ -1518,6 +1553,7 @@ function openRepairModal(id = null) {
     document.getElementById('f-date').value   = new Date().toISOString().split('T')[0];
     document.getElementById('f-status').value = 'open';
     if (masterSel) masterSel.value = state.login || '';
+    if (coderSel) coderSel.value = state.config.defaultCoder || '';
     state.formWorks   = [];
     state.formCodings = [];
   }
@@ -2094,6 +2130,7 @@ async function saveRepair() {
     date: document.getElementById('f-date').value,
     dateDone: document.getElementById('f-date-done').value || '',
     master: document.getElementById('f-master')?.value || '',
+    coder:  document.getElementById('f-coder-sel')?.value || '',
     notes: document.getElementById('f-notes').value.trim(),
     status: document.getElementById('f-status').value,
     worksTotal:   Math.round(worksTotal),
@@ -2502,6 +2539,7 @@ function renderStats() {
 
   renderSupplierDebts();
   renderMasterSalaries(from, to);
+  renderCoderSalaries(from, to);
 }
 
 function renderRepairAnalysis() {
@@ -3005,6 +3043,113 @@ async function addSalaryPayment(master) {
   hideLoader();
 }
 
+
+// ============================================================
+// КОДУВАЛЬНИКИ — виплати
+// ============================================================
+
+function renderCoderSalaries(from, to) {
+  const el = document.getElementById('stat-coder-salaries');
+  if (!el) return;
+  const done = state.repairs.filter(j =>
+    j.status === 'done' && j.coder && (
+      j.dateDone ? (j.dateDone >= from && j.dateDone <= to)
+                 : (j.date && j.date >= from && j.date <= to)
+    )
+  );
+  const coderMap = {};
+  done.forEach(j => {
+    const coder = j.coder;
+    if (!coderMap[coder]) coderMap[coder] = 0;
+    coderMap[coder] += (j.codingsTotal || 0);
+  });
+
+  el.innerHTML = Object.entries(coderMap).sort((a,b)=>b[1]-a[1]).map(([coder, earned]) => {
+    const payments     = (state.coderPayments||[]).filter(p => p.coder === coder);
+    const totalPaid    = payments.reduce((a,p) => a+(p.amount||0), 0);
+    const paidInPeriod = payments
+      .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
+      .reduce((a,p) => a+(p.amount||0), 0);
+    const debt      = Math.round(earned - totalPaid);
+    const debtColor = debt > 0 ? '#e05050' : '#27c47a';
+    const periodPayments = payments
+      .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
+      .sort((a,b) => b.date.localeCompare(a.date));
+
+    return `<div class="ra-sup-item" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px">
+          <div style="font-weight:700;font-size:13px;color:#d070d0">${escapeHtml(coder)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">нараховано: <b style="color:var(--text2)">${Math.round(earned).toLocaleString()} грн</b></div>
+          <div style="font-size:11px;color:var(--text3)">виплачено за період: <b style="color:#27c47a">${Math.round(paidInPeriod).toLocaleString()} грн</b></div>
+          <div style="font-size:11px;color:var(--text3)">всього виплачено: <b style="color:#27c47a">${Math.round(totalPaid).toLocaleString()} грн</b></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:14px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '}${Math.abs(debt).toLocaleString()} грн</div>
+          <div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end">
+            <input type="number" placeholder="сума" min="0"
+              style="width:80px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px"
+              id="coder-pay-${escapeHtml(coder)}">
+            <button class="btn-p sm" style="font-size:11px;padding:4px 8px;background:#7a2e7a"
+              onclick="addCoderPayment('${escapeHtml(coder)}')">+ Виплатити</button>
+          </div>
+        </div>
+      </div>
+      ${periodPayments.length ? `
+      <div style="border-top:1px solid var(--border);padding-top:6px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px">Виплати за період:</div>
+        ${periodPayments.map(p => `
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bg4)">
+            <span style="color:var(--text3)">${escapeHtml(p.date ? new Date(p.date).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')}</span>
+            <b style="color:#27c47a;white-space:nowrap">+${(p.amount||0).toLocaleString()} грн</b>
+          </div>`).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-size:13px">Немає кодувальників з нарахуваннями за цей період</div>';
+}
+
+async function addCoderPayment(coder) {
+  const inp    = document.getElementById('coder-pay-' + coder);
+  const amount = parseFloat(inp ? inp.value : '') || 0;
+  if (!amount) { toast('Введіть суму', 'error'); return; }
+  showLoader();
+  const res = await api({ action: 'saveCoderPayment', item: {
+    coder, date: new Date().toISOString(), amount: Math.round(amount)
+  }});
+  if (res.ok) {
+    if (inp) inp.value = '';
+    await reloadData();
+    const from = document.getElementById('stat-from').value;
+    const to   = document.getElementById('stat-to').value;
+    renderCoderSalaries(from, to);
+    toast('Виплачено ' + Math.round(amount).toLocaleString() + ' грн → ' + coder, 'success');
+  } else toast(res.error || 'Помилка', 'error');
+  hideLoader();
+}
+
+// ============================================================
+// НАЛАШТУВАННЯ — кодувальник за замовчуванням
+// ============================================================
+
+function renderDefaultCoderPanel() {
+  const sel = document.getElementById('default-coder-sel');
+  if (!sel) return;
+  const coders = state.users.filter(u => u.role === 'coder');
+  sel.innerHTML = '<option value="">— не обрано —</option>' +
+    coders.map(u => `<option value="${escapeHtml(u.login)}" ${(state.config.defaultCoder||'') === u.login ? 'selected' : ''}>${escapeHtml(u.login)}</option>`).join('');
+}
+
+async function saveDefaultCoder() {
+  const val = document.getElementById('default-coder-sel')?.value || '';
+  showLoader();
+  const res = await api({ action: 'saveConfig', item: { key: 'defaultCoder', value: val } });
+  if (res.ok) {
+    state.config.defaultCoder = val;
+    toast(val ? 'Кодувальник за замовчуванням: ' + val : 'Значення скинуто', 'success');
+  } else toast(res.error || 'Помилка', 'error');
+  hideLoader();
+}
+
 // ============================================================
 // SETTINGS
 // ============================================================
@@ -3014,8 +3159,10 @@ function renderSettings() {
   renderWorksCatalog();
   renderCodingsCatalog();
   renderStockSettings();
+  renderDefaultCoderPanel();
   if (state.role === 'admin') renderUsers();
   document.getElementById('users-panel').style.display = state.role === 'admin' ? '' : 'none';
+  document.getElementById('default-coder-panel').style.display = state.role === 'admin' ? '' : 'none';
 }
 
 function renderSuppliers() {
@@ -3484,6 +3631,7 @@ function renderUsers() {
             <label>Роль</label>
             <select id="uedit-role-${u.id}">
               <option value="master" ${u.role==='master'?'selected':''}>Майстер</option>
+              <option value="coder"  ${u.role==='coder' ?'selected':''}>Кодувальник</option>
               <option value="viewer" ${u.role==='viewer'?'selected':''}>Перегляд</option>
               <option value="admin"  ${u.role==='admin' ?'selected':''}>Admin</option>
             </select>
