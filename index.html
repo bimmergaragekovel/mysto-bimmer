@@ -198,6 +198,30 @@ a{color:inherit;text-decoration:none}
 /* ===================== PARTS SECTION IN FORM ===================== */
 .parts-section{border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:4px}
 .parts-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:700;margin-bottom:12px}
+
+/* ===================== FORM TABS ===================== */
+.form-tabs-wrap{display:flex;border-radius:var(--radius2) var(--radius2) 0 0;overflow:hidden;border:1px solid #2a2a2a;border-bottom:none;margin-top:4px}
+.form-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;background:#242424;color:#bbb;border:none;cursor:pointer;border-right:1px solid #2a2a2a;position:relative;font-family:var(--font)}
+.form-tab:last-child{border-right:none}
+.form-tab-count{font-size:10px;font-weight:800;padding:2px 6px;border-radius:10px;line-height:1.4;background:#333;color:#aaa}
+.form-tab-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.form-tab.ft-works .form-tab-dot{background:#3dd68c}
+.form-tab.ft-coding .form-tab-dot{background:#c060c0}
+.form-tab.ft-parts .form-tab-dot{background:#4d9fd6}
+.form-tab.ft-works.on{background:#0d1a10;color:#fff}
+.form-tab.ft-works.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#3dd68c}
+.form-tab.ft-works.on .form-tab-count{background:rgba(61,214,140,.15);color:#3dd68c}
+.form-tab.ft-coding.on{background:#160e17;color:#fff}
+.form-tab.ft-coding.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#c060c0}
+.form-tab.ft-coding.on .form-tab-count{background:rgba(192,80,192,.15);color:#d070d0}
+.form-tab.ft-parts.on{background:#0d1520;color:#fff}
+.form-tab.ft-parts.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#4d9fd6}
+.form-tab.ft-parts.on .form-tab-count{background:rgba(77,159,214,.15);color:#5aaddf}
+.form-tab-body{border:1px solid #2a2a2a;border-top:none;border-radius:0 0 var(--radius2) var(--radius2);padding:14px;display:none}
+.form-tab-body.active{display:block}
+.form-tab-body.ftb-works{background:#0d1a10;border-color:#1a2e1e}
+.form-tab-body.ftb-coding{background:#160e17;border-color:#2a1530}
+.form-tab-body.ftb-parts{background:#0d1520;border-color:#152030}
 .part-add-grid{display:grid;grid-template-columns:1fr 90px;gap:10px;margin-bottom:10px}
 .part-add-grid2{display:grid;grid-template-columns:70px 100px auto 90px 90px;gap:8px;align-items:end;margin-bottom:8px}
 .mu-preview{font-size:12px;color:var(--text3);margin-top:4px;min-height:16px}
@@ -366,6 +390,26 @@ a{color:inherit;text-decoration:none}
 .ra-sup-vals{text-align:right;font-size:12px;line-height:1.6}
 .ra-sup-cost{color:var(--text3)}
 .ra-sup-margin{color:var(--green2);font-weight:700}
+
+/* ===================== SUPPLIER DEBT CARD (Variant A) ===================== */
+.sd-card{background:#141414;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;margin-bottom:8px}
+.sd-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#171717;border-bottom:1px solid #1e1e1e;flex-wrap:wrap}
+.sd-debt{margin-left:auto;font-size:15px;font-weight:800;color:#e05050;white-space:nowrap}
+.sd-debt.paid{color:#27c47a}
+.sd-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#1e1e1e}
+.sd-stat{background:#141414;padding:9px 14px}
+.sd-stat-label{font-size:10px;color:#606060;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px}
+.sd-stat-val{font-size:13px;font-weight:700;color:#c8c8c8}
+.sd-stat-val.green{color:#27c47a}
+.sd-controls{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#121212;border-top:1px solid #1a1a1a}
+.sd-pay-input{width:100px;font-size:12px;padding:5px 8px;background:#1e1e1e;border:1px solid #2a2a2a;color:#f5f5f5;border-radius:5px;font-family:var(--font)}
+.sd-pay-btn{background:#c00;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.sd-payments{padding:8px 14px 10px;border-top:1px solid #1a1a1a}
+.sd-pay-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#505050;margin-bottom:5px}
+.sd-pay-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid #181818}
+.sd-pay-row:last-child{border:none}
+.sd-pay-date{color:#606060}
+.sd-pay-amt{color:#27c47a;font-weight:700;white-space:nowrap}
 
 /* ===================== CATALOG SECTIONS ===================== */
 .cat-section{border-radius:var(--radius2);overflow:hidden;margin-bottom:8px}
@@ -636,6 +680,7 @@ a{color:inherit;text-decoration:none}
           <button class="btn-p sm" style="width:100%" onclick="addStockTracker()">+ Додати</button>
         </div>
       </div>
+      <div class="settings-panel full">
         <div class="sp-title">Каталог запчастин</div>
         <div id="parts-list"></div>
         <div class="cat-add-box">
@@ -744,9 +789,21 @@ a{color:inherit;text-decoration:none}
         <div class="fl fw"><label>Нотатки</label><textarea id="f-notes" placeholder="Опис несправності, коментар майстра..."></textarea></div>
       </div>
 
-      <!-- WORKS BLOCK -->
-      <div class="parts-section" style="margin-bottom:10px">
-        <div class="parts-title">Роботи</div>
+      <!-- TABS: WORKS / CODING / PARTS -->
+      <div class="form-tabs-wrap">
+        <button class="form-tab ft-works on" onclick="switchFormTab('works')">
+          <span class="form-tab-dot"></span>Роботи<span class="form-tab-count" id="ftc-works">0</span>
+        </button>
+        <button class="form-tab ft-coding" onclick="switchFormTab('coding')">
+          <span class="form-tab-dot"></span>Кодування<span class="form-tab-count" id="ftc-coding">0</span>
+        </button>
+        <button class="form-tab ft-parts" onclick="switchFormTab('parts')">
+          <span class="form-tab-dot"></span>Запчастини<span class="form-tab-count" id="ftc-parts">0</span>
+        </button>
+      </div>
+
+      <!-- TAB: WORKS -->
+      <div class="form-tab-body ftb-works active" id="ftb-works">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div class="fl fw"><label>З каталогу</label>
             <select id="f-work-sel" onchange="onWorkSelChange()">
@@ -763,17 +820,16 @@ a{color:inherit;text-decoration:none}
             <input type="number" id="f-work-cost" placeholder="0" min="0">
           </div>
         </div>
-        <button class="btn-p sm" style="width:100%;margin-bottom:10px" onclick="addFormWork()">+ Додати роботу</button>
+        <button class="btn-p sm" style="width:100%;margin-bottom:10px;background:#1e7a45" onclick="addFormWork()">+ Додати роботу</button>
         <div id="form-works-list"></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:6px;border-top:0.5px solid var(--border)">
-          <span style="color:var(--text3)">Сума робіт:</span>
-          <span id="form-works-total" style="font-weight:700">0 грн</span>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:6px;border-top:1px solid #1a2e1e">
+          <span style="color:#5a9070">Сума робіт:</span>
+          <span id="form-works-total" style="font-weight:700;color:#3dd68c">0 грн</span>
         </div>
       </div>
 
-      <!-- CODINGS BLOCK -->
-      <div class="parts-section" style="margin-bottom:10px">
-        <div class="parts-title">Кодування</div>
+      <!-- TAB: CODING -->
+      <div class="form-tab-body ftb-coding" id="ftb-coding">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div class="fl fw"><label>З каталогу</label>
             <select id="f-coding-sel" onchange="onCodingSelChange()">
@@ -790,17 +846,16 @@ a{color:inherit;text-decoration:none}
             <input type="number" id="f-coding-cost" placeholder="0" min="0">
           </div>
         </div>
-        <button class="btn-p sm" style="width:100%;margin-bottom:10px" onclick="addFormCoding()">+ Додати кодування</button>
+        <button class="btn-p sm" style="width:100%;margin-bottom:10px;background:#7a2e7a" onclick="addFormCoding()">+ Додати кодування</button>
         <div id="form-codings-list"></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:6px;border-top:0.5px solid var(--border)">
-          <span style="color:var(--text3)">Сума кодування:</span>
-          <span id="form-codings-total" style="font-weight:700">0 грн</span>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:6px;border-top:1px solid #2a1530">
+          <span style="color:#806080">Сума кодування:</span>
+          <span id="form-codings-total" style="font-weight:700;color:#d070d0">0 грн</span>
         </div>
       </div>
 
-      <!-- PARTS -->
-      <div class="parts-section">
-        <div class="parts-title">Запчастини та матеріали</div>
+      <!-- TAB: PARTS -->
+      <div class="form-tab-body ftb-parts" id="ftb-parts">
         <div class="part-add-grid">
           <div class="fl"><label>З каталогу</label>
             <select id="p-cat-sel" onchange="onPartCatSelect()">
@@ -827,7 +882,7 @@ a{color:inherit;text-decoration:none}
         </div>
         <div class="mu-preview" id="mu-preview"></div>
         <div style="display:flex;justify-content:flex-end;margin-top:8px">
-          <button class="btn-p sm" onclick="addFormPart()">+ Додати запчастину</button>
+          <button class="btn-p sm" style="background:#1a5a90" onclick="addFormPart()">+ Додати запчастину</button>
         </div>
         <div class="parts-list" id="form-parts-list"></div>
         <div class="form-total">
@@ -1421,6 +1476,9 @@ function openRepairModal(id = null) {
   state.formWorks = [];
   state.formCodings = [];
 
+  switchFormTab('works');
+  updateFormTabCounts();
+
   document.getElementById('modal-title').textContent = id ? 'Редагувати ремонт' : 'Новий ремонт';
 
   // Заповнюємо селекти
@@ -1548,10 +1606,29 @@ function updateFormWork(id, field, value) {
   calcFormWorkTotal(); calcFormTotal();
 }
 
+function switchFormTab(t) {
+  ['works','coding','parts'].forEach(n => {
+    const tab = document.querySelector('.form-tab.ft-' + n);
+    const body = document.getElementById('ftb-' + n);
+    if (tab) tab.classList.toggle('on', n === t);
+    if (body) body.classList.toggle('active', n === t);
+  });
+}
+
+function updateFormTabCounts() {
+  const cw = document.getElementById('ftc-works');
+  const cc = document.getElementById('ftc-coding');
+  const cp = document.getElementById('ftc-parts');
+  if (cw) cw.textContent = (state.formWorks || []).length;
+  if (cc) cc.textContent = (state.formCodings || []).length;
+  if (cp) cp.textContent = (state.formParts || []).length;
+}
+
 function calcFormWorkTotal() {
   const total = state.formWorks.reduce((s, w) => s + (w.retail || 0), 0);
   const el = document.getElementById('form-works-total');
   if (el) el.textContent = total + ' грн';
+  updateFormTabCounts();
 }
 
 function updateFormWorkName(id, value) {
@@ -1658,6 +1735,7 @@ function calcFormCodingTotal() {
   const total = state.formCodings.reduce((s, c) => s + (c.retail || 0), 0);
   const el = document.getElementById('form-codings-total');
   if (el) el.textContent = total + ' грн';
+  updateFormTabCounts();
 }
 
 function renderFormCodings() {
@@ -1829,6 +1907,7 @@ function removeFormPart(id) {
 
 function renderFormParts() {
   const el = document.getElementById('form-parts-list');
+  updateFormTabCounts();
   if (!state.formParts.length) { el.innerHTML = ''; return; }
   el.innerHTML = state.formParts.map(p => {
     const saleTotal = Math.round(p.sale * p.qty);
@@ -2512,7 +2591,6 @@ function renderSupplierDebts() {
   const from = document.getElementById('stat-from')?.value || '';
   const to   = document.getElementById('stat-to')?.value   || '';
 
-  // Загальна сума закупівель з ремонтів
   const debtMap = {};
   state.repairs.forEach(j => {
     (j.parts||[]).forEach(p => {
@@ -2528,43 +2606,49 @@ function renderSupplierDebts() {
     const paidInPeriod = supPayments
       .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
       .reduce((a,p) => a+(p.amount||0), 0);
-    const debt      = Math.round(totalCost - totalPaid);
-    const debtColor = debt > 0 ? '#e05050' : '#27c47a';
+    const debt = Math.round(totalCost - totalPaid);
     const periodPayments = supPayments
       .filter(p => !from || !to || (p.date && p.date.slice(0,10) >= from && p.date.slice(0,10) <= to))
       .sort((a,b) => b.date.localeCompare(a.date));
 
-    return `<div class="ra-sup-item" style="flex-direction:column;align-items:stretch;gap:8px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="sup-badge ${supClass(s)}" style="min-width:90px">${escapeHtml(s)}</span>
-        <div style="flex:1;font-size:12px">
-          <span style="color:var(--text2);font-weight:700">${Math.round(totalCost).toLocaleString()} грн</span>
-          <span style="color:var(--text3);margin-left:6px">загальна закупівля</span>
-          ${from && to ? `<br><span style="color:var(--text3)">за період сплачено: <b style="color:#27c47a">${Math.round(paidInPeriod).toLocaleString()} грн</b></span>` : ''}
-          <br><span style="color:var(--text3)">всього сплачено: <b style="color:#27c47a">${Math.round(totalPaid).toLocaleString()} грн</b></span>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:14px;font-weight:800;color:${debtColor}">${debt > 0 ? 'борг: ' : '✓ '}${Math.abs(debt).toLocaleString()} грн</div>
-          <div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end">
-            <input type="number" placeholder="сума" min="0"
-              style="width:80px;font-size:11px;padding:3px 6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:4px"
-              id="sup-pay-${escapeHtml(s)}">
-            <button class="btn-p sm" style="font-size:11px;padding:4px 8px"
-              onclick="addSupplierPayment('${escapeHtml(s)}')">+ Сплатити</button>
-          </div>
+    const debtLabel = debt > 0
+      ? `<span class="sd-debt">Борг: ${Math.abs(debt).toLocaleString()} грн</span>`
+      : `<span class="sd-debt paid">✓ Сплачено</span>`;
+
+    const paymentsHtml = periodPayments.length ? `
+      <div class="sd-payments">
+        <div class="sd-pay-title">Платежі${from && to ? ' за період' : ''}:</div>
+        ${periodPayments.map(p => `
+          <div class="sd-pay-row">
+            <span class="sd-pay-date">${escapeHtml(p.date ? new Date(p.date).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')}</span>
+            <span class="sd-pay-amt">+${(p.amount||0).toLocaleString()} грн</span>
+          </div>`).join('')}
+      </div>` : '';
+
+    return `<div class="sd-card">
+      <div class="sd-header">
+        <span class="sup-badge ${supClass(s)}">${escapeHtml(s)}</span>
+        ${debtLabel}
+        <div style="display:flex;gap:5px;align-items:center">
+          <input type="number" placeholder="сума" min="0" class="sd-pay-input" id="sup-pay-${escapeHtml(s)}">
+          <button class="sd-pay-btn" onclick="addSupplierPayment('${escapeHtml(s)}')">+ Сплатити</button>
         </div>
       </div>
-      ${periodPayments.length ? `
-      <div style="border-top:1px solid var(--border);padding-top:6px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px">
-          Платежі${from && to ? ' за період' : ''}:
+      <div class="sd-stats">
+        <div class="sd-stat">
+          <div class="sd-stat-label">Загальна закупівля</div>
+          <div class="sd-stat-val">${Math.round(totalCost).toLocaleString()} грн</div>
         </div>
-        ${periodPayments.map(p => `
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bg4)">
-            <span style="color:var(--text3)">${escapeHtml(p.date ? new Date(p.date).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')}</span>
-            <b style="color:#27c47a;white-space:nowrap">+${(p.amount||0).toLocaleString()} грн</b>
-          </div>`).join('')}
-      </div>` : ''}
+        <div class="sd-stat">
+          <div class="sd-stat-label">За період сплачено</div>
+          <div class="sd-stat-val green">${Math.round(paidInPeriod).toLocaleString()} грн</div>
+        </div>
+        <div class="sd-stat">
+          <div class="sd-stat-label">Всього сплачено</div>
+          <div class="sd-stat-val green">${Math.round(totalPaid).toLocaleString()} грн</div>
+        </div>
+      </div>
+      ${paymentsHtml}
     </div>`;
   }).join('') || '<div style="color:var(--text3);font-size:13px">Немає запчастин</div>';
 }
