@@ -2,9 +2,6 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BimmerGarage — СТО</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -494,48 +491,10 @@ a{color:inherit;text-decoration:none}
   .pst-head span:nth-child(3),.pst-row span:nth-child(3){display:none}
 }
 
-
-  @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Exo 2',Arial,sans-serif;background:#fff;color:#111;padding:11mm 13mm;font-size:10px;line-height:1.35}
-  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3mm}
-  .brand{font-size:17px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
-  .brand-sub{font-size:8px;color:#888;margin-top:1px}
-  .mstripe{display:flex;gap:2px;margin-top:2px}
-  .mstripe span{display:block;height:2px;width:14px;border-radius:1px}
-  .doc-meta{text-align:right;font-size:9px;color:#666;line-height:1.5}
-  .doc-title{font-size:12px;font-weight:800;color:#cc0000;letter-spacing:.04em}
-  .red-line{border:none;border-top:2px solid #cc0000;margin:2mm 0}
-  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8mm;margin:2.5mm 0}
-  .field-row{display:flex;gap:2mm;margin-bottom:1mm;font-size:9px}
-  .field-label{font-weight:700;min-width:16mm;color:#777;flex-shrink:0}
-  .field-val{color:#111}
-  .note-row{font-size:8px;color:#888;margin:1mm 0;font-style:italic}
-  .section-title{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#cc0000;margin:2.5mm 0 1mm;padding-left:3px;border-left:2px solid #cc0000}
-  table{width:100%;border-collapse:collapse;margin-bottom:0}
-  th{text-align:left;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:.8mm 1.5mm;border-bottom:1px solid #ddd;background:#fafafa}
-  td{padding:.9mm 1.5mm;border-bottom:1px solid #f0f0f0;font-size:9px;vertical-align:middle}
-  td.r{text-align:right;font-weight:600;white-space:nowrap}
-  .sub td{font-weight:700;border-top:1.5px solid #bbb;border-bottom:none;background:#f5f5f5;font-size:9px}
-  .total-block{margin-top:2.5mm;padding:2mm 3mm;border:1.5px solid #ddd;border-radius:2px}
-  .t-row{display:flex;justify-content:space-between;align-items:center;padding:.7mm 0}
-  .t-label{font-size:9px;font-weight:600;color:#555}
-  .t-val{font-size:9.5px;font-weight:700;color:#111}
-  .grand-row{display:flex;justify-content:space-between;align-items:center;padding:1.5mm 0 0;margin-top:1mm;border-top:2px solid #cc0000}
-  .grand-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
-  .grand-val{font-size:15px;font-weight:800;color:#cc0000}
-  .debt-val{font-size:12px;font-weight:800;color:#cc0000}
-  .sign-row{display:flex;justify-content:space-between;margin-top:7mm;font-size:9px;color:#555}
-  .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
-  @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
 /* ===================== WAREHOUSE ===================== */
-
-/* Period row */
 .period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .period-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
 .period-row input{flex:1;min-width:110px}
-
-/* KPI strip */
 .va-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:14px}
 .va-strip-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
 .va-strip-cell.hl{border-color:#cc000055;background:#180808}
@@ -544,11 +503,7 @@ a{color:inherit;text-decoration:none}
 .va-num{font-size:16px;font-weight:900;line-height:1;color:var(--text)}
 .va-num.r{color:var(--red2)}.va-num.g{color:var(--green2)}
 .va-cur{font-size:9px;font-weight:500;color:var(--text4)}
-
-/* Section title */
 .va-sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin:14px 0 8px}
-
-/* Supplier cards */
 .va-sup{display:flex;align-items:center;gap:10px;padding:10px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:5px}
 .va-sup-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .va-sup-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
@@ -557,25 +512,17 @@ a{color:inherit;text-decoration:none}
 .va-sup-debt{font-size:14px;font-weight:900;color:var(--red2)}
 .va-sup-debt.ok{color:var(--green2);font-size:16px}
 .va-sup-paid{font-size:10px;color:var(--green2);margin-top:1px}
-
-/* Info cards */
 .va-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:14px 0}
 .va-info-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
 .va-info-v{font-size:13px;font-weight:800;margin-top:3px}
 .va-info-v.am{color:var(--amber)}.va-info-v.bl{color:var(--blue)}
 .va-itag{font-size:8px;color:var(--text4);background:var(--bg4);padding:1px 4px;border-radius:3px;vertical-align:middle}
-
-/* Payment block */
 .va-pay{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:16px}
 .va-pay select,.va-pay input{width:100%;background:var(--bg4);color:var(--text);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;margin-bottom:6px}
 .va-pay-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:9px;font-size:12px;font-weight:700;font-family:inherit;width:100%;cursor:pointer}
-
-/* List header */
 .va-list-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .va-list-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
 .va-add-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:6px 11px;font-size:10px;font-weight:700;font-family:inherit;cursor:pointer}
-
-/* Товарні групи */
 .va-group{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
 .va-group-hdr{display:flex;align-items:center;padding:11px 12px;gap:8px;cursor:pointer;user-select:none}
 .va-group-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
@@ -583,11 +530,9 @@ a{color:inherit;text-decoration:none}
 .va-group-badge.ok{color:var(--green2);border-color:#27c47a44;background:#0a1a0f}
 .va-group-badge.lo{color:var(--amber);border-color:#f0a02044;background:#1a1000}
 .va-group-badge.em{color:var(--red2);border-color:#cc000044;background:#180808}
-.va-chevron{color:var(--text4);font-size:14px;flex-shrink:0;transition:.2s}
+.va-chevron{color:var(--text4);font-size:14px;flex-shrink:0}
 .va-group-body{display:none;border-top:1px solid var(--border)}
 .va-group-body.open{display:block}
-
-/* Партія */
 .va-batch{padding:11px 12px;border-bottom:1px solid var(--border)}
 .va-batch:last-child{border-bottom:none}
 .va-batch-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
@@ -596,15 +541,14 @@ a{color:inherit;text-decoration:none}
 .va-batch-qty{font-size:14px;font-weight:900;color:var(--text);text-align:right}
 .va-batch-price{font-size:10px;color:var(--text4);text-align:right;margin-top:2px}
 .va-progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:8px}
-.va-progress-fill{height:100%;border-radius:2px;transition:.3s}
+.va-progress-fill{height:100%;border-radius:2px}
 .va-batch-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
-.va-usage{font-size:10px;color:var(--text4);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.va-usage{font-size:10px;color:var(--text4);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;display:inline-flex;align-items:center;gap:4px}
 .va-usage::before{content:'↗';color:var(--red2);font-size:9px}
 .va-batch-btns{display:flex;gap:5px;flex-shrink:0}
 .va-btn-sm{font-size:10px;font-weight:700;border:none;border-radius:6px;padding:5px 10px;font-family:inherit;cursor:pointer}
 .va-btn-sm.write{background:#0a1e0a;color:var(--green2)}
 .va-btn-sm.del{background:#1a0808;color:var(--red2)}
-
 </style>
 </head>
 <body>
@@ -895,8 +839,6 @@ a{color:inherit;text-decoration:none}
 
 <!-- WAREHOUSE TAB -->
 <div class="main hidden" id="warehouse-tab" style="display:none">
-
-  <!-- Фільтр периоду -->
   <div class="period-row">
     <label>Період:</label>
     <input type="date" id="wh-from">
@@ -904,17 +846,12 @@ a{color:inherit;text-decoration:none}
     <input type="date" id="wh-to">
     <button class="btn-p sm" onclick="renderWarehouse()">Оновити</button>
   </div>
-
-  <!-- Фінанси складу -->
   <div id="wh-finance"></div>
-
-  <!-- Список товарів -->
   <div class="va-list-hdr">
     <div class="va-list-title">Товари на складі</div>
     <button class="va-add-btn" onclick="openWarehouseAddModal()">+ Закупівля</button>
   </div>
   <div id="wh-list"></div>
-
 </div>
 
 <!-- WAREHOUSE ADD MODAL -->
@@ -936,9 +873,7 @@ a{color:inherit;text-decoration:none}
       <div class="fg">
         <div class="fl">
           <label>Постачальник</label>
-          <select id="wh-supplier-sel">
-            <option value="">— обрати —</option>
-          </select>
+          <select id="wh-supplier-sel"><option value="">— обрати —</option></select>
         </div>
         <div class="fl">
           <label>Дата</label>
@@ -948,7 +883,7 @@ a{color:inherit;text-decoration:none}
       <div class="fg">
         <div class="fl">
           <label>Кількість</label>
-          <input type="number" id="wh-qty" placeholder="0" min="0.01" step="0.01">
+          <input type="number" id="wh-qty" placeholder="0" min="0.01" step="0.01" oninput="updateWhTotalPreview()">
         </div>
         <div class="fl">
           <label>Одиниця</label>
@@ -957,8 +892,8 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="fg">
         <div class="fl">
-          <label>Прихідна ціна за одиницю (грн)</label>
-          <input type="number" id="wh-cost" placeholder="0" min="0" step="0.01">
+          <label>Прихідна ціна за од. (грн)</label>
+          <input type="number" id="wh-cost" placeholder="0" min="0" step="0.01" oninput="updateWhTotalPreview()">
         </div>
         <div class="fl">
           <label>Сума закупівлі</label>
@@ -985,14 +920,12 @@ a{color:inherit;text-decoration:none}
       <div class="fg">
         <div class="fl fw">
           <label>Ремонт</label>
-          <select id="wh-usage-repair">
-            <option value="">— обрати ремонт —</option>
-          </select>
+          <select id="wh-usage-repair"><option value="">— обрати ремонт —</option></select>
         </div>
       </div>
       <div class="fg">
         <div class="fl">
-          <label>Кількість для списання</label>
+          <label>Кількість</label>
           <input type="number" id="wh-usage-qty" placeholder="0" min="0.01" step="0.01">
         </div>
         <div class="fl">
@@ -1177,9 +1110,6 @@ let state = {
   stockBatches:   [],
   supPayments:       [],
   salaryPayments:    [],
-  warehouseItems:    [],
-  warehouseUsage:    [],
-  warehousePayments: [],
   coderPayments:     [],
   config:            {},
   filter: 'all',
@@ -1347,11 +1277,7 @@ async function initApp() {
     initWarehouseDates();
     // Фонове оновлення без лоадера
     api({ action: 'initData' }).then(res => {
-      if (res && res.ok) {
-        applyData(res); saveCache(res); renderRepairs();
-        // Якщо вкладка Склад активна — оновити і її
-        if (document.getElementById('warehouse-tab')?.style.display !== 'none') renderWarehouse();
-      }
+      if (res && res.ok) { applyData(res); saveCache(res); renderRepairs(); }
     }).catch(() => {});
   } else {
     showLoader();
@@ -1378,7 +1304,7 @@ function showTab(name, el) {
   // Синхронізуємо обидві навігації (desktop + mobile)
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   // Активуємо відповідні кнопки в обох рядках
-  const ids = { repairs: ['tab-repairs','tab-repairs-m'], stats: ['tab-stats','tab-stats-m'], settings: ['tab-settings','tab-settings-m'], warehouse: ['tab-warehouse','tab-warehouse-m'] };
+  const ids = { repairs: ['tab-repairs','tab-repairs-m'], stats: ['tab-stats','tab-stats-m'], settings: ['tab-settings','tab-settings-m'] };
   (ids[name] || []).forEach(id => { const b = document.getElementById(id); if(b) b.classList.add('active'); });
   ['repairs','stats','settings','warehouse'].forEach(t => {
     const el = document.getElementById(t + '-tab');
@@ -2474,7 +2400,41 @@ async function sharePDF(id) {
 <html>
 <head>
 <meta charset="UTF-8">
-
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Exo 2',Arial,sans-serif;background:#fff;color:#111;padding:11mm 13mm;font-size:10px;line-height:1.35}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3mm}
+  .brand{font-size:17px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+  .brand-sub{font-size:8px;color:#888;margin-top:1px}
+  .mstripe{display:flex;gap:2px;margin-top:2px}
+  .mstripe span{display:block;height:2px;width:14px;border-radius:1px}
+  .doc-meta{text-align:right;font-size:9px;color:#666;line-height:1.5}
+  .doc-title{font-size:12px;font-weight:800;color:#cc0000;letter-spacing:.04em}
+  .red-line{border:none;border-top:2px solid #cc0000;margin:2mm 0}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8mm;margin:2.5mm 0}
+  .field-row{display:flex;gap:2mm;margin-bottom:1mm;font-size:9px}
+  .field-label{font-weight:700;min-width:16mm;color:#777;flex-shrink:0}
+  .field-val{color:#111}
+  .note-row{font-size:8px;color:#888;margin:1mm 0;font-style:italic}
+  .section-title{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#cc0000;margin:2.5mm 0 1mm;padding-left:3px;border-left:2px solid #cc0000}
+  table{width:100%;border-collapse:collapse;margin-bottom:0}
+  th{text-align:left;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:.8mm 1.5mm;border-bottom:1px solid #ddd;background:#fafafa}
+  td{padding:.9mm 1.5mm;border-bottom:1px solid #f0f0f0;font-size:9px;vertical-align:middle}
+  td.r{text-align:right;font-weight:600;white-space:nowrap}
+  .sub td{font-weight:700;border-top:1.5px solid #bbb;border-bottom:none;background:#f5f5f5;font-size:9px}
+  .total-block{margin-top:2.5mm;padding:2mm 3mm;border:1.5px solid #ddd;border-radius:2px}
+  .t-row{display:flex;justify-content:space-between;align-items:center;padding:.7mm 0}
+  .t-label{font-size:9px;font-weight:600;color:#555}
+  .t-val{font-size:9.5px;font-weight:700;color:#111}
+  .grand-row{display:flex;justify-content:space-between;align-items:center;padding:1.5mm 0 0;margin-top:1mm;border-top:2px solid #cc0000}
+  .grand-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+  .grand-val{font-size:15px;font-weight:800;color:#cc0000}
+  .debt-val{font-size:12px;font-weight:800;color:#cc0000}
+  .sign-row{display:flex;justify-content:space-between;margin-top:7mm;font-size:9px;color:#555}
+  .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
+  @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
+</style>
 </head>
 <body>
   <div class="header">
@@ -3949,62 +3909,57 @@ function toggleCatRow(rowEl) {
 // ============================================================
 // WAREHOUSE — Склад
 // ============================================================
-
-let _whCurrentItemId = null; // для модалки списання
+let _whCurrentItemId = null;
 
 function initWarehouseDates() {
   const now = new Date();
-  const y   = now.getFullYear();
-  const m   = String(now.getMonth() + 1).padStart(2, '0');
-  document.getElementById('wh-from').value = `${y}-${m}-01`;
-  document.getElementById('wh-to').value   = now.toISOString().split('T')[0];
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const el_from = document.getElementById('wh-from');
+  const el_to   = document.getElementById('wh-to');
+  if (el_from) el_from.value = `${y}-${m}-01`;
+  if (el_to)   el_to.value   = now.toISOString().split('T')[0];
 }
 
-// ---- Головний рендер вкладки Склад ----
 function renderWarehouse() {
   renderWarehouseFinance();
   renderWarehouseList();
 }
 
-// ---- Фінанси складу ----
+function getBadgeColor(supplier) {
+  const map = {'АвтоАптека':'#4d9fd6','Автотехнікс':'#ef9f27','Місцевий':'#27c47a','RockAuto':'#c060c0','Ori':'#e05a5a','BimmerGarage':'#4d9fd6'};
+  return map[supplier] || '#888';
+}
+
 function renderWarehouseFinance() {
   const el = document.getElementById('wh-finance');
   if (!el) return;
-
   const items    = state.warehouseItems    || [];
   const payments = state.warehousePayments || [];
   const usage    = state.warehouseUsage    || [];
 
   const totalBought = items.reduce((s,i) => s + i.qty * i.costPerUnit, 0);
-
   const paidBySupplier = {};
   payments.forEach(p => { paidBySupplier[p.supplier] = (paidBySupplier[p.supplier]||0) + (p.amount||0); });
-  const totalPaid = Object.values(paidBySupplier).reduce((s,v) => s+v, 0);
+  const totalPaid = Object.values(paidBySupplier).reduce((s,v)=>s+v, 0);
   const totalDebt = Math.round(totalBought - totalPaid);
-
-  const totalUsed = usage.reduce((s,u) => {
-    const it = items.find(i => i.id === u.warehouseId);
-    return s + (it ? it.costPerUnit * u.qty : 0);
-  }, 0);
+  const totalUsed = usage.reduce((s,u) => { const it = items.find(i=>i.id===u.warehouseId); return s+(it?it.costPerUnit*u.qty:0); }, 0);
   const totalLeft = items.reduce((s,i) => s + i.qtyLeft * i.costPerUnit, 0);
-
   const boughtBySupplier = {};
   items.forEach(i => { boughtBySupplier[i.supplier] = (boughtBySupplier[i.supplier]||0) + i.qty * i.costPerUnit; });
 
   const supRows = Object.entries(boughtBySupplier).sort((a,b)=>b[1]-a[1]).map(([sup, bought]) => {
     const paid = paidBySupplier[sup] || 0;
     const debt = Math.round(bought - paid);
-    const dot  = getBadgeColor(sup);
-    return `
-    <div class="va-sup">
-      <div class="va-sup-dot" style="background:${dot}"></div>
+    return `<div class="va-sup">
+      <div class="va-sup-dot" style="background:${getBadgeColor(sup)}"></div>
       <div style="flex:1">
         <div class="va-sup-name">${escapeHtml(sup)}</div>
         <div class="va-sup-sub">закуплено ${Math.round(bought).toLocaleString()} грн</div>
       </div>
       <div class="va-sup-right">
-        <div class="va-sup-debt ${debt<=0?'ok':''}">${debt > 0 ? debt.toLocaleString()+' грн' : '✓'}</div>
-        <div class="va-sup-paid">${debt > 0 ? 'сплач. '+Math.round(paid).toLocaleString()+' грн' : 'сплачено'}</div>
+        <div class="va-sup-debt ${debt<=0?'ok':''}">${debt>0?debt.toLocaleString()+' грн':'✓'}</div>
+        <div class="va-sup-paid">${debt>0?'сплач. '+Math.round(paid).toLocaleString()+' грн':'сплачено'}</div>
       </div>
     </div>`;
   }).join('');
@@ -4024,10 +3979,8 @@ function renderWarehouseFinance() {
         <div class="va-num ${totalDebt>0?'r':'g'}">${totalDebt.toLocaleString()}<span class="va-cur"> грн</span></div>
       </div>
     </div>
-
     <div class="va-sec">По постачальниках</div>
-    ${supRows || '<div style="color:var(--text3);font-size:12px;padding:6px 0">Немає закупівель</div>'}
-
+    ${supRows||'<div style="color:var(--text3);font-size:12px;padding:6px 0">Немає закупівель</div>'}
     <div class="va-info">
       <div class="va-info-card">
         <div class="va-lbl">Списано в ремонти</div>
@@ -4038,7 +3991,6 @@ function renderWarehouseFinance() {
         <div class="va-info-v bl">${Math.round(totalLeft).toLocaleString()} грн <span class="va-itag">інфо</span></div>
       </div>
     </div>
-
     <div class="va-pay">
       <div class="va-lbl" style="margin-bottom:8px">Оплатити борг постачальнику</div>
       <select id="wh-pay-supplier">
@@ -4050,58 +4002,37 @@ function renderWarehouseFinance() {
     </div>`;
 }
 
-function getBadgeColor(supplier) {
-  const map = {
-    'АвтоАптека': '#4d9fd6',
-    'Автотехнікс': '#ef9f27',
-    'Місцевий':   '#27c47a',
-    'RockAuto':   '#c060c0',
-    'Ori':        '#e05a5a',
-    'BimmerGarage':'#4d9fd6',
-  };
-  return map[supplier] || '#888';
-}
-
-// ---- Список товарів ----
 function renderWarehouseList() {
-  const el   = document.getElementById('wh-list');
+  const el = document.getElementById('wh-list');
   if (!el) return;
-  const from = document.getElementById('wh-from')?.value || '';
-  const to   = document.getElementById('wh-to')?.value   || '';
+  const from  = document.getElementById('wh-from')?.value || '';
+  const to    = document.getElementById('wh-to')?.value   || '';
   const items = state.warehouseItems || [];
   const usage = state.warehouseUsage || [];
 
-  if (!items.length) {
-    el.innerHTML = '<div class="empty"><p>Склад порожній. Додай першу закупівлю.</p></div>';
-    return;
-  }
+  if (!items.length) { el.innerHTML='<div class="empty"><p>Склад порожній. Додай першу закупівлю.</p></div>'; return; }
 
-  // Групуємо по назві
   const groups = {};
   items.forEach(i => {
-    const inPeriod = !from || !to || (i.date >= from && i.date <= to);
-    if (!inPeriod && i.qtyLeft <= 0) return;
-    if (!groups[i.partName]) groups[i.partName] = { partName: i.partName, unit: i.unit, batches: [] };
+    const inPeriod = !from||!to||(i.date>=from&&i.date<=to);
+    if (!inPeriod && i.qtyLeft<=0) return;
+    if (!groups[i.partName]) groups[i.partName]={partName:i.partName,unit:i.unit,batches:[]};
     groups[i.partName].batches.push(i);
   });
 
-  if (!Object.keys(groups).length) {
-    el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center">Немає товарів за обраний період</div>';
-    return;
-  }
+  if (!Object.keys(groups).length) { el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center">Немає товарів за обраний період</div>'; return; }
 
   el.innerHTML = Object.values(groups).map(g => {
     const totalLeft = Math.round(g.batches.reduce((s,b)=>s+(b.qtyLeft||0),0)*100)/100;
     const totalQty  = g.batches.reduce((s,b)=>s+(b.qty||0),0);
-    const badgeClass = totalLeft <= 0 ? 'em' : totalLeft < totalQty * 0.25 ? 'lo' : 'ok';
-    const badgeText  = totalLeft <= 0 ? 'Закінчився' : `${totalLeft} ${g.unit}`;
+    const badgeClass = totalLeft<=0?'em':totalLeft<totalQty*0.25?'lo':'ok';
+    const badgeText  = totalLeft<=0?'Закінчився':`${totalLeft} ${g.unit}`;
 
     const batchRows = g.batches.map(b => {
-      const bUsage = usage.filter(u => u.warehouseId === b.id);
-      const leftPct = b.qty > 0 ? Math.round(b.qtyLeft / b.qty * 100) : 0;
-      const barColor = leftPct > 50 ? 'var(--green2)' : leftPct > 20 ? 'var(--amber)' : 'var(--red2)';
-
-      const usageTags = bUsage.map(u => `
+      const bUsage = usage.filter(u=>u.warehouseId===b.id);
+      const leftPct = b.qty>0?Math.round(b.qtyLeft/b.qty*100):0;
+      const barColor = leftPct>50?'var(--green2)':leftPct>20?'var(--amber)':'var(--red2)';
+      const usageTags = bUsage.map(u=>`
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">
           <span class="va-usage">${escapeHtml(u.repairLabel||'Ремонт')} — ${u.qty} ${escapeHtml(b.unit)}</span>
           ${state.role==='admin'?`<button class="va-btn-sm del" style="padding:2px 6px" onclick="deleteWarehouseUsage('${escapeHtml(u.id)}')">✕</button>`:''}
@@ -4109,29 +4040,22 @@ function renderWarehouseList() {
 
       return `<div class="va-batch">
         <div class="va-batch-row1">
-          <div>
-            <div class="va-batch-sup">${escapeHtml(b.supplier||'—')}</div>
-            <div class="va-batch-date">${escapeHtml(b.date||'—')}</div>
-          </div>
-          <div>
-            <div class="va-batch-qty">${b.qtyLeft} / ${b.qty} ${escapeHtml(b.unit)}</div>
-            <div class="va-batch-price">${b.costPerUnit.toLocaleString()} грн/${escapeHtml(b.unit)} · ${Math.round(b.qty*b.costPerUnit).toLocaleString()} грн</div>
-          </div>
+          <div><div class="va-batch-sup">${escapeHtml(b.supplier||'—')}</div><div class="va-batch-date">${escapeHtml(b.date||'—')}</div></div>
+          <div><div class="va-batch-qty">${b.qtyLeft} / ${b.qty} ${escapeHtml(b.unit)}</div><div class="va-batch-price">${b.costPerUnit.toLocaleString()} грн/${escapeHtml(b.unit)} · ${Math.round(b.qty*b.costPerUnit).toLocaleString()} грн</div></div>
         </div>
         <div class="va-progress"><div class="va-progress-fill" style="width:${leftPct}%;background:${barColor}"></div></div>
-        ${usageTags ? `<div style="margin-bottom:6px">${usageTags}</div>` : ''}
-        <div class="va-batch-foot">
-          <div></div>
+        ${usageTags?`<div style="margin-bottom:6px">${usageTags}</div>`:''}
+        <div class="va-batch-foot"><div></div>
           <div class="va-batch-btns">
-            ${b.qtyLeft > 0 && state.role==='admin' ? `<button class="va-btn-sm write" onclick="openWarehouseUsageModal('${escapeHtml(b.id)}')">Списати</button>` : ''}
-            ${b.qtyLeft >= b.qty && state.role==='admin' ? `<button class="va-btn-sm del" onclick="deleteWarehouseItemBtn('${escapeHtml(b.id)}')">Видалити</button>` : ''}
+            ${b.qtyLeft>0&&state.role==='admin'?`<button class="va-btn-sm write" onclick="openWarehouseUsageModal('${escapeHtml(b.id)}')">Списати</button>`:''}
+            ${b.qtyLeft>=b.qty&&state.role==='admin'?`<button class="va-btn-sm del" onclick="deleteWarehouseItemBtn('${escapeHtml(b.id)}')">Видалити</button>`:''}
           </div>
         </div>
       </div>`;
     }).join('');
 
     return `<div class="va-group">
-      <div class="va-group-hdr" onclick="this.querySelector('.va-chevron').style.transform=this.nextElementSibling.classList.toggle('open')?'rotate(90deg)':'';this.nextElementSibling.classList.toggle('open');">
+      <div class="va-group-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
         <span class="va-group-name">${escapeHtml(g.partName)}</span>
         <span class="va-group-badge ${badgeClass}">${badgeText}</span>
         <span class="va-chevron">›</span>
@@ -4141,31 +4065,24 @@ function renderWarehouseList() {
   }).join('');
 }
 
-// ---- Відкрити модалку нової закупівлі ----
 function openWarehouseAddModal() {
-  // Заповнити селект товарів з каталогу
   const partSel = document.getElementById('wh-part-sel');
   partSel.innerHTML = '<option value="">— обрати товар —</option>' +
-    (state.parts||[]).map(p => `<option value="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}" data-unit="${escapeHtml(p.unit||'шт')}">${escapeHtml(p.name)} (${escapeHtml(p.unit||'шт')})</option>`).join('');
-
-  // Заповнити постачальників
+    (state.parts||[]).map(p=>`<option value="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}" data-unit="${escapeHtml(p.unit||'шт')}">${escapeHtml(p.name)} (${escapeHtml(p.unit||'шт')})</option>`).join('');
   const supSel = document.getElementById('wh-supplier-sel');
   supSel.innerHTML = '<option value="">— обрати —</option>' +
-    (state.suppliers||[]).map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
-
-  // Дата = сьогодні
+    (state.suppliers||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
   document.getElementById('wh-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('wh-qty').value  = '';
   document.getElementById('wh-cost').value = '';
   document.getElementById('wh-unit').value = '';
   document.getElementById('wh-total-preview').textContent = '0 грн';
-
   openModal('wh-add-modal');
 }
 
 function onWhPartSelect() {
-  const sel  = document.getElementById('wh-part-sel');
-  const opt  = sel.options[sel.selectedIndex];
+  const sel = document.getElementById('wh-part-sel');
+  const opt = sel.options[sel.selectedIndex];
   document.getElementById('wh-unit').value = opt.dataset.unit || 'шт';
   updateWhTotalPreview();
 }
@@ -4173,7 +4090,7 @@ function onWhPartSelect() {
 function updateWhTotalPreview() {
   const qty  = parseFloat(document.getElementById('wh-qty').value)  || 0;
   const cost = parseFloat(document.getElementById('wh-cost').value) || 0;
-  document.getElementById('wh-total-preview').textContent = Math.round(qty * cost).toLocaleString() + ' грн';
+  document.getElementById('wh-total-preview').textContent = Math.round(qty*cost).toLocaleString()+' грн';
 }
 
 async function saveWarehouseItem() {
@@ -4186,42 +4103,33 @@ async function saveWarehouseItem() {
   const date     = document.getElementById('wh-date').value;
   const qty      = parseFloat(document.getElementById('wh-qty').value)  || 0;
   const cost     = parseFloat(document.getElementById('wh-cost').value) || 0;
-
-  if (!partId)   { toast('Оберіть товар', 'error'); return; }
-  if (!supplier) { toast('Оберіть постачальника', 'error'); return; }
-  if (!qty)      { toast('Вкажіть кількість', 'error'); return; }
-  if (!cost)     { toast('Вкажіть прихідну ціну', 'error'); return; }
-  if (!date)     { toast('Вкажіть дату', 'error'); return; }
-
+  if (!partId)   { toast('Оберіть товар','error'); return; }
+  if (!supplier) { toast('Оберіть постачальника','error'); return; }
+  if (!qty)      { toast('Вкажіть кількість','error'); return; }
+  if (!cost)     { toast('Вкажіть прихідну ціну','error'); return; }
+  if (!date)     { toast('Вкажіть дату','error'); return; }
   showLoader();
-  const res = await api({ action: 'saveWarehouseItem', item: { partId, partName, unit, supplier, date, qty, costPerUnit: cost } });
+  const res = await api({ action:'saveWarehouseItem', item:{ partId, partName, unit, supplier, date, qty, costPerUnit:cost } });
   hideLoader();
-  if (!res.ok) { toast(res.error || 'Помилка', 'error'); return; }
+  if (!res.ok) { toast(res.error||'Помилка','error'); return; }
   closeModal('wh-add-modal');
   toast('Закупівлю збережено');
-  const fresh = await api({ action: 'initData' });
+  const fresh = await api({ action:'initData' });
   if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
 }
 
-// ---- Списання ----
 function openWarehouseUsageModal(itemId) {
   _whCurrentItemId = itemId;
-  const item = (state.warehouseItems||[]).find(i => i.id === itemId);
+  const item = (state.warehouseItems||[]).find(i=>i.id===itemId);
   if (!item) return;
-
   document.getElementById('wh-usage-info').innerHTML =
     `<b>${escapeHtml(item.partName)}</b> · ${escapeHtml(item.supplier)} · ${escapeHtml(item.date)}<br>` +
-    `Залишок: <b style="color:var(--green2)">${item.qtyLeft} ${escapeHtml(item.unit)}</b> · ` +
-    `${item.costPerUnit.toLocaleString()} грн/${escapeHtml(item.unit)}`;
-
-  // Заповнити список ремонтів
+    `Залишок: <b style="color:var(--green2)">${item.qtyLeft} ${escapeHtml(item.unit)}</b> · ${item.costPerUnit.toLocaleString()} грн/${escapeHtml(item.unit)}`;
   const repSel = document.getElementById('wh-usage-repair');
   repSel.innerHTML = '<option value="">— обрати ремонт —</option>' +
-    (state.repairs||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(j =>
-      `<option value="${escapeHtml(String(j.id))}" data-label="${escapeHtml(j.car+(j.client?' — '+j.client:'')+(j.date?' — '+j.date:''))}">` +
-      `${escapeHtml(j.car)}${j.client?' — '+escapeHtml(j.client):''}${j.date?' — '+escapeHtml(j.date):''}</option>`
+    (state.repairs||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(j=>
+      `<option value="${escapeHtml(String(j.id))}" data-label="${escapeHtml(j.car+(j.client?' — '+j.client:'')+(j.date?' — '+j.date:''))}">${escapeHtml(j.car)}${j.client?' — '+escapeHtml(j.client):''}${j.date?' — '+escapeHtml(j.date):''}</option>`
     ).join('');
-
   document.getElementById('wh-usage-qty').value  = '';
   document.getElementById('wh-usage-date').value = new Date().toISOString().split('T')[0];
   openModal('wh-usage-modal');
@@ -4234,77 +4142,63 @@ async function confirmWarehouseUsage() {
   const repOpt   = repSel.options[repSel.selectedIndex];
   const qty      = parseFloat(document.getElementById('wh-usage-qty').value) || 0;
   const date     = document.getElementById('wh-usage-date').value;
-
-  if (!repairId) { toast('Оберіть ремонт', 'error'); return; }
-  if (!qty)      { toast('Вкажіть кількість', 'error'); return; }
-
-  const item = (state.warehouseItems||[]).find(i => i.id === itemId);
-  if (item && qty > item.qtyLeft) { toast(`Залишок тільки ${item.qtyLeft} ${item.unit}`, 'error'); return; }
-
+  if (!repairId) { toast('Оберіть ремонт','error'); return; }
+  if (!qty)      { toast('Вкажіть кількість','error'); return; }
+  const item = (state.warehouseItems||[]).find(i=>i.id===itemId);
+  if (item && qty>item.qtyLeft) { toast(`Залишок тільки ${item.qtyLeft} ${item.unit}`,'error'); return; }
   showLoader();
-  const res = await api({ action: 'saveWarehouseUsage', item: {
-    warehouseId:  itemId,
-    repairId,
-    repairLabel:  repOpt?.dataset?.label || repOpt?.text || '',
-    qty,
-    date,
-  }});
+  const res = await api({ action:'saveWarehouseUsage', item:{ warehouseId:itemId, repairId, repairLabel:repOpt?.dataset?.label||repOpt?.text||'', qty, date } });
   hideLoader();
-  if (!res.ok) { toast(res.error || 'Помилка', 'error'); return; }
+  if (!res.ok) { toast(res.error||'Помилка','error'); return; }
   closeModal('wh-usage-modal');
   toast('Списано зі складу');
-  const fresh = await api({ action: 'initData' });
+  const fresh = await api({ action:'initData' });
   if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
 }
 
 async function deleteWarehouseUsage(usageId) {
   if (!confirm('Скасувати списання?')) return;
   showLoader();
-  const res = await api({ action: 'deleteWarehouseUsage', id: usageId });
+  const res = await api({ action:'deleteWarehouseUsage', id:usageId });
   hideLoader();
   if (!res.ok) { toast(res.error||'Помилка','error'); return; }
   toast('Списання скасовано');
-  const fresh = await api({ action: 'initData' });
+  const fresh = await api({ action:'initData' });
   if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
 }
 
 async function deleteWarehouseItemBtn(itemId) {
   if (!confirm('Видалити партію?')) return;
   showLoader();
-  const res = await api({ action: 'deleteWarehouseItem', id: itemId });
+  const res = await api({ action:'deleteWarehouseItem', id:itemId });
   hideLoader();
   if (!res.ok) { toast(res.error||'Помилка','error'); return; }
   toast('Партію видалено');
-  const fresh = await api({ action: 'initData' });
+  const fresh = await api({ action:'initData' });
   if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
 }
 
 async function addWarehousePayment() {
   const supplier = document.getElementById('wh-pay-supplier').value;
   const amount   = parseFloat(document.getElementById('wh-pay-amount').value) || 0;
-  if (!supplier) { toast('Оберіть постачальника', 'error'); return; }
-  if (!amount)   { toast('Вкажіть суму', 'error'); return; }
+  if (!supplier) { toast('Оберіть постачальника','error'); return; }
+  if (!amount)   { toast('Вкажіть суму','error'); return; }
   showLoader();
-  const res = await api({ action: 'saveWarehousePayment', item: {
-    supplier, amount, date: new Date().toISOString().split('T')[0]
-  }});
+  const res = await api({ action:'saveWarehousePayment', item:{ supplier, amount, date:new Date().toISOString().split('T')[0] } });
   hideLoader();
   if (!res.ok) { toast(res.error||'Помилка','error'); return; }
   toast('Оплату збережено');
   document.getElementById('wh-pay-amount').value = '';
-  const fresh = await api({ action: 'initData' });
+  const fresh = await api({ action:'initData' });
   if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
 }
 
-// Підказка наявності в формі ремонту
 function getWarehouseStock(partId) {
-  const items = (state.warehouseItems||[]).filter(i => i.partId === partId && i.qtyLeft > 0);
+  const items = (state.warehouseItems||[]).filter(i=>i.partId===partId&&i.qtyLeft>0);
   if (!items.length) return null;
-  const total = Math.round(items.reduce((s,i) => s+i.qtyLeft, 0) * 100) / 100;
-  const unit  = items[0].unit;
-  return { total, unit };
+  const total = Math.round(items.reduce((s,i)=>s+i.qtyLeft,0)*100)/100;
+  return { total, unit:items[0].unit };
 }
-
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showLoader()   { document.getElementById('loader').classList.add('show'); }
@@ -4328,6 +4222,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-58</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-59</div>
 </body>
 </html>
