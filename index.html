@@ -782,24 +782,21 @@ a{color:inherit;text-decoration:none}
 <div class="main hidden" id="warehouse-tab" style="display:none">
 
   <!-- Фільтр периоду -->
-  <div class="period-row" style="margin-bottom:16px">
+  <div class="period-row">
     <label>Період:</label>
     <input type="date" id="wh-from">
-    <span style="color:var(--text3)">—</span>
+    <span style="color:var(--text3);font-weight:700">—</span>
     <input type="date" id="wh-to">
-    <button class="fbadge active" onclick="renderWarehouse()">Оновити</button>
+    <button class="btn-p sm" onclick="renderWarehouse()">Оновити</button>
   </div>
 
   <!-- Фінанси складу -->
-  <div class="stat-panel" style="margin-bottom:16px">
-    <div class="stat-panel-title">Фінанси складу</div>
-    <div id="wh-finance"></div>
-  </div>
+  <div id="wh-finance"></div>
 
-  <!-- Список товарів на складі -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)">Товари на складі</div>
-    <button class="btn-p sm" onclick="openWarehouseAddModal()">+ Нова закупівля</button>
+  <!-- Список товарів -->
+  <div class="va-list-hdr">
+    <div class="va-list-title">Товари на складі</div>
+    <button class="va-add-btn" onclick="openWarehouseAddModal()">+ Закупівля</button>
   </div>
   <div id="wh-list"></div>
 
@@ -2393,43 +2390,81 @@ async function sharePDF(id) {
   .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
   @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
 /* ===================== WAREHOUSE ===================== */
-.wh-group{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);margin-bottom:10px;overflow:hidden}
-.wh-group-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
-.wh-group-name{font-size:14px;font-weight:700;color:var(--text);flex:1}
-.wh-group-stock{font-size:12px;color:var(--text3)}
-.wh-group-stock b{color:var(--green2)}
-.wh-group-stock.low b{color:var(--amber)}
-.wh-group-stock.empty b{color:var(--red2)}
-.wh-group-body{display:none;border-top:1px solid var(--border);padding:0}
-.wh-group-body.open{display:block}
-.wh-batch{display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px}
-.wh-batch:last-child{border-bottom:none}
-.wh-batch-date{color:var(--text3);font-size:11px}
-.wh-batch-sup{color:var(--text2);font-weight:600}
-.wh-batch-qty{text-align:right;font-weight:700;color:var(--text)}
-.wh-batch-cost{text-align:right;color:var(--text3)}
-.wh-batch-actions{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
-.wh-usage-tag{font-size:10px;color:var(--text4);padding:2px 6px;background:var(--bg4);border-radius:3px;border:1px solid var(--border2)}
-.wh-finance-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.wh-finance-grid{grid-template-columns:1fr}}
-.wh-fin-block{background:var(--bg4);border-radius:var(--radius);padding:12px}
-.wh-fin-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px}
-.wh-fin-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0}
-.wh-fin-label{color:var(--text3)}
-.wh-fin-val{font-weight:700;color:var(--text)}
-.wh-fin-val.green{color:var(--green2)}
-.wh-fin-val.red{color:var(--red2)}
-.wh-fin-val.amber{color:var(--amber)}
-.wh-fin-divider{border:none;border-top:1px solid var(--border);margin:6px 0}
-.wh-fin-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;padding-top:4px}
-.wh-sup-detail{font-size:11px;color:var(--text4);padding-left:8px;margin-top:2px}
-.wh-pay-row{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
-.wh-pay-input{width:90px;font-size:12px;padding:5px 8px}
-.wh-pay-sup{width:130px;font-size:12px;padding:5px 8px}
-@media(max-width:500px){
-  .wh-batch{grid-template-columns:1fr 1fr;gap:6px}
-}
 
+/* Period row */
+.period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.period-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
+.period-row input{flex:1;min-width:110px}
+
+/* KPI strip */
+.va-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:14px}
+.va-strip-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.va-strip-cell.hl{border-color:#cc000055;background:#180808}
+.va-strip-cell.good{border-color:#1a3a1a}
+.va-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px}
+.va-num{font-size:16px;font-weight:900;line-height:1;color:var(--text)}
+.va-num.r{color:var(--red2)}.va-num.g{color:var(--green2)}
+.va-cur{font-size:9px;font-weight:500;color:var(--text4)}
+
+/* Section title */
+.va-sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin:14px 0 8px}
+
+/* Supplier cards */
+.va-sup{display:flex;align-items:center;gap:10px;padding:10px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:5px}
+.va-sup-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.va-sup-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
+.va-sup-sub{font-size:10px;color:var(--text4);margin-top:2px}
+.va-sup-right{text-align:right;flex-shrink:0}
+.va-sup-debt{font-size:14px;font-weight:900;color:var(--red2)}
+.va-sup-debt.ok{color:var(--green2);font-size:16px}
+.va-sup-paid{font-size:10px;color:var(--green2);margin-top:1px}
+
+/* Info cards */
+.va-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:14px 0}
+.va-info-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
+.va-info-v{font-size:13px;font-weight:800;margin-top:3px}
+.va-info-v.am{color:var(--amber)}.va-info-v.bl{color:var(--blue)}
+.va-itag{font-size:8px;color:var(--text4);background:var(--bg4);padding:1px 4px;border-radius:3px;vertical-align:middle}
+
+/* Payment block */
+.va-pay{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:16px}
+.va-pay select,.va-pay input{width:100%;background:var(--bg4);color:var(--text);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;margin-bottom:6px}
+.va-pay-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:9px;font-size:12px;font-weight:700;font-family:inherit;width:100%;cursor:pointer}
+
+/* List header */
+.va-list-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.va-list-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.va-add-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:6px 11px;font-size:10px;font-weight:700;font-family:inherit;cursor:pointer}
+
+/* Товарні групи */
+.va-group{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
+.va-group-hdr{display:flex;align-items:center;padding:11px 12px;gap:8px;cursor:pointer;user-select:none}
+.va-group-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
+.va-group-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid}
+.va-group-badge.ok{color:var(--green2);border-color:#27c47a44;background:#0a1a0f}
+.va-group-badge.lo{color:var(--amber);border-color:#f0a02044;background:#1a1000}
+.va-group-badge.em{color:var(--red2);border-color:#cc000044;background:#180808}
+.va-chevron{color:var(--text4);font-size:14px;flex-shrink:0;transition:.2s}
+.va-group-body{display:none;border-top:1px solid var(--border)}
+.va-group-body.open{display:block}
+
+/* Партія */
+.va-batch{padding:11px 12px;border-bottom:1px solid var(--border)}
+.va-batch:last-child{border-bottom:none}
+.va-batch-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.va-batch-sup{font-size:12px;font-weight:700;color:var(--text2)}
+.va-batch-date{font-size:10px;color:var(--text4);margin-top:2px}
+.va-batch-qty{font-size:14px;font-weight:900;color:var(--text);text-align:right}
+.va-batch-price{font-size:10px;color:var(--text4);text-align:right;margin-top:2px}
+.va-progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:8px}
+.va-progress-fill{height:100%;border-radius:2px;transition:.3s}
+.va-batch-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+.va-usage{font-size:10px;color:var(--text4);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.va-usage::before{content:'↗';color:var(--red2);font-size:9px}
+.va-batch-btns{display:flex;gap:5px;flex-shrink:0}
+.va-btn-sm{font-size:10px;font-weight:700;border:none;border-radius:6px;padding:5px 10px;font-family:inherit;cursor:pointer}
+.va-btn-sm.write{background:#0a1e0a;color:var(--green2)}
+.va-btn-sm.del{background:#1a0808;color:var(--red2)}
 </style>
 </head>
 <body>
@@ -3924,93 +3959,98 @@ function renderWarehouse() {
 
 // ---- Фінанси складу ----
 function renderWarehouseFinance() {
-  const el   = document.getElementById('wh-finance');
+  const el = document.getElementById('wh-finance');
   if (!el) return;
-  const from = document.getElementById('wh-from')?.value || '';
-  const to   = document.getElementById('wh-to')?.value   || '';
 
   const items    = state.warehouseItems    || [];
   const payments = state.warehousePayments || [];
   const usage    = state.warehouseUsage    || [];
 
-  // Загальна закупівля (всі партії)
-  const totalBought = items.reduce((s, i) => s + (i.qty * i.costPerUnit), 0);
+  const totalBought = items.reduce((s,i) => s + i.qty * i.costPerUnit, 0);
 
-  // Сплачено по постачальниках
   const paidBySupplier = {};
-  payments.forEach(p => {
-    paidBySupplier[p.supplier] = (paidBySupplier[p.supplier] || 0) + (p.amount || 0);
-  });
-  const totalPaid = Object.values(paidBySupplier).reduce((s, v) => s + v, 0);
+  payments.forEach(p => { paidBySupplier[p.supplier] = (paidBySupplier[p.supplier]||0) + (p.amount||0); });
+  const totalPaid = Object.values(paidBySupplier).reduce((s,v) => s+v, 0);
   const totalDebt = Math.round(totalBought - totalPaid);
 
-  // Списано в ремонти (за собів.)
-  const totalUsed = usage.reduce((s, u) => {
-    const item = items.find(i => i.id === u.warehouseId);
-    return s + (item ? item.costPerUnit * u.qty : 0);
+  const totalUsed = usage.reduce((s,u) => {
+    const it = items.find(i => i.id === u.warehouseId);
+    return s + (it ? it.costPerUnit * u.qty : 0);
   }, 0);
+  const totalLeft = items.reduce((s,i) => s + i.qtyLeft * i.costPerUnit, 0);
 
-  // Залишок на складі (за собів.)
-  const totalLeft = items.reduce((s, i) => s + (i.qtyLeft * i.costPerUnit), 0);
-
-  // Закуплено по постачальниках
   const boughtBySupplier = {};
-  items.forEach(i => {
-    boughtBySupplier[i.supplier] = (boughtBySupplier[i.supplier] || 0) + (i.qty * i.costPerUnit);
-  });
+  items.forEach(i => { boughtBySupplier[i.supplier] = (boughtBySupplier[i.supplier]||0) + i.qty * i.costPerUnit; });
 
-  const supRows = Object.entries(boughtBySupplier).sort((a,b)=>b[1]-a[1]).map(([s, bought]) => {
-    const paid = paidBySupplier[s] || 0;
+  const supRows = Object.entries(boughtBySupplier).sort((a,b)=>b[1]-a[1]).map(([sup, bought]) => {
+    const paid = paidBySupplier[sup] || 0;
     const debt = Math.round(bought - paid);
-    return `<div class="wh-fin-row">
-      <span class="wh-fin-label">${escapeHtml(s)}</span>
-      <span class="wh-fin-val ${debt>0?'red':''}">${debt>0?'борг: '+Math.abs(debt).toLocaleString()+' грн':'✓ '+Math.round(paid).toLocaleString()+' грн'}</span>
+    const dot  = getBadgeColor(sup);
+    return `
+    <div class="va-sup">
+      <div class="va-sup-dot" style="background:${dot}"></div>
+      <div style="flex:1">
+        <div class="va-sup-name">${escapeHtml(sup)}</div>
+        <div class="va-sup-sub">закуплено ${Math.round(bought).toLocaleString()} грн</div>
+      </div>
+      <div class="va-sup-right">
+        <div class="va-sup-debt ${debt<=0?'ok':''}">${debt > 0 ? debt.toLocaleString()+' грн' : '✓'}</div>
+        <div class="va-sup-paid">${debt > 0 ? 'сплач. '+Math.round(paid).toLocaleString()+' грн' : 'сплачено'}</div>
+      </div>
     </div>`;
   }).join('');
 
   el.innerHTML = `
-    <div class="wh-finance-grid">
-      <div class="wh-fin-block">
-        <div class="wh-fin-title">Закупівлі та борг</div>
-        <div class="wh-fin-row">
-          <span class="wh-fin-label">Закуплено товарів:</span>
-          <span class="wh-fin-val">${Math.round(totalBought).toLocaleString()} грн</span>
-        </div>
-        <div class="wh-fin-row" style="padding-top:4px">
-          <span class="wh-fin-label" style="font-weight:700">Сплачено постачальникам:</span>
-          <span class="wh-fin-val green">${Math.round(totalPaid).toLocaleString()} грн</span>
-        </div>
-        ${supRows}
-        <hr class="wh-fin-divider">
-        <div class="wh-fin-total">
-          <span>Борг:</span>
-          <span style="color:${totalDebt>0?'var(--red2)':'var(--green2)'}">${totalDebt.toLocaleString()} грн</span>
-        </div>
+    <div class="va-strip">
+      <div class="va-strip-cell">
+        <div class="va-lbl">Закуплено</div>
+        <div class="va-num">${Math.round(totalBought).toLocaleString()}<span class="va-cur"> грн</span></div>
       </div>
-      <div class="wh-fin-block">
-        <div class="wh-fin-title">Рух товарів</div>
-        <div class="wh-fin-row">
-          <span class="wh-fin-label">Списано в ремонти:</span>
-          <span class="wh-fin-val amber">${Math.round(totalUsed).toLocaleString()} грн <span style="font-size:10px;font-weight:400">(інформативно)</span></span>
-        </div>
-        <hr class="wh-fin-divider">
-        <div class="wh-fin-total">
-          <span>Залишок на складі:</span>
-          <span style="color:var(--blue)">${Math.round(totalLeft).toLocaleString()} грн <span style="font-size:10px;font-weight:400">(інформативно)</span></span>
-        </div>
-        <div style="margin-top:12px">
-          <div class="wh-fin-title">Оплатити борг</div>
-          <div class="wh-pay-row">
-            <select class="wh-pay-sup" id="wh-pay-supplier">
-              <option value="">— постачальник —</option>
-              ${Object.keys(boughtBySupplier).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
-            </select>
-            <input type="number" class="wh-pay-input" id="wh-pay-amount" placeholder="сума" min="0">
-            <button class="btn-p sm" onclick="addWarehousePayment()">+ Сплатити</button>
-          </div>
-        </div>
+      <div class="va-strip-cell good">
+        <div class="va-lbl">Сплачено</div>
+        <div class="va-num g">${Math.round(totalPaid).toLocaleString()}<span class="va-cur"> грн</span></div>
       </div>
+      <div class="va-strip-cell ${totalDebt>0?'hl':'good'}">
+        <div class="va-lbl">Борг</div>
+        <div class="va-num ${totalDebt>0?'r':'g'}">${totalDebt.toLocaleString()}<span class="va-cur"> грн</span></div>
+      </div>
+    </div>
+
+    <div class="va-sec">По постачальниках</div>
+    ${supRows || '<div style="color:var(--text3);font-size:12px;padding:6px 0">Немає закупівель</div>'}
+
+    <div class="va-info">
+      <div class="va-info-card">
+        <div class="va-lbl">Списано в ремонти</div>
+        <div class="va-info-v am">${Math.round(totalUsed).toLocaleString()} грн <span class="va-itag">інфо</span></div>
+      </div>
+      <div class="va-info-card">
+        <div class="va-lbl">Залишок на складі</div>
+        <div class="va-info-v bl">${Math.round(totalLeft).toLocaleString()} грн <span class="va-itag">інфо</span></div>
+      </div>
+    </div>
+
+    <div class="va-pay">
+      <div class="va-lbl" style="margin-bottom:8px">Оплатити борг постачальнику</div>
+      <select id="wh-pay-supplier">
+        <option value="">— постачальник —</option>
+        ${Object.keys(boughtBySupplier).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
+      </select>
+      <input type="number" id="wh-pay-amount" placeholder="Сума, грн" min="0">
+      <button class="va-pay-btn" onclick="addWarehousePayment()">+ Сплатити</button>
     </div>`;
+}
+
+function getBadgeColor(supplier) {
+  const map = {
+    'АвтоАптека': '#4d9fd6',
+    'Автотехнікс': '#ef9f27',
+    'Місцевий':   '#27c47a',
+    'RockAuto':   '#c060c0',
+    'Ori':        '#e05a5a',
+    'BimmerGarage':'#4d9fd6',
+  };
+  return map[supplier] || '#888';
 }
 
 // ---- Список товарів ----
@@ -4019,22 +4059,19 @@ function renderWarehouseList() {
   if (!el) return;
   const from = document.getElementById('wh-from')?.value || '';
   const to   = document.getElementById('wh-to')?.value   || '';
-
-  const items = state.warehouseItems    || [];
-  const usage = state.warehouseUsage    || [];
+  const items = state.warehouseItems || [];
+  const usage = state.warehouseUsage || [];
 
   if (!items.length) {
     el.innerHTML = '<div class="empty"><p>Склад порожній. Додай першу закупівлю.</p></div>';
     return;
   }
 
-  // Групуємо по назві товару
+  // Групуємо по назві
   const groups = {};
   items.forEach(i => {
-    // Правило відображення: ховаємо якщо партія поза періодом І залишок = 0
     const inPeriod = !from || !to || (i.date >= from && i.date <= to);
     if (!inPeriod && i.qtyLeft <= 0) return;
-
     if (!groups[i.partName]) groups[i.partName] = { partName: i.partName, unit: i.unit, batches: [] };
     groups[i.partName].batches.push(i);
   });
@@ -4045,42 +4082,52 @@ function renderWarehouseList() {
   }
 
   el.innerHTML = Object.values(groups).map(g => {
-    const totalLeft = g.batches.reduce((s,b) => s+(b.qtyLeft||0), 0);
-    const totalQty  = g.batches.reduce((s,b) => s+(b.qty||0), 0);
-    const stockClass = totalLeft <= 0 ? 'empty' : totalLeft < totalQty * 0.2 ? 'low' : '';
+    const totalLeft = Math.round(g.batches.reduce((s,b)=>s+(b.qtyLeft||0),0)*100)/100;
+    const totalQty  = g.batches.reduce((s,b)=>s+(b.qty||0),0);
+    const badgeClass = totalLeft <= 0 ? 'em' : totalLeft < totalQty * 0.25 ? 'lo' : 'ok';
+    const badgeText  = totalLeft <= 0 ? 'Закінчився' : `${totalLeft} ${g.unit}`;
 
     const batchRows = g.batches.map(b => {
-      // Списання по цій партії
       const bUsage = usage.filter(u => u.warehouseId === b.id);
-      const usageHtml = bUsage.map(u => `
-        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-          <span class="wh-usage-tag">↗ ${escapeHtml(u.repairLabel||'Ремонт')} — ${u.qty} ${escapeHtml(b.unit)}</span>
-          ${state.role==='admin'?`<button class="btn-d" style="font-size:10px;padding:2px 6px" onclick="deleteWarehouseUsage('${escapeHtml(u.id)}')">✕</button>`:''}
+      const leftPct = b.qty > 0 ? Math.round(b.qtyLeft / b.qty * 100) : 0;
+      const barColor = leftPct > 50 ? 'var(--green2)' : leftPct > 20 ? 'var(--amber)' : 'var(--red2)';
+
+      const usageTags = bUsage.map(u => `
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">
+          <span class="va-usage">${escapeHtml(u.repairLabel||'Ремонт')} — ${u.qty} ${escapeHtml(b.unit)}</span>
+          ${state.role==='admin'?`<button class="va-btn-sm del" style="padding:2px 6px" onclick="deleteWarehouseUsage('${escapeHtml(u.id)}')">✕</button>`:''}
         </div>`).join('');
 
-      return `<div class="wh-batch">
-        <div>
-          <div class="wh-batch-date">${escapeHtml(b.date||'—')}</div>
-          <div class="wh-batch-sup">${escapeHtml(b.supplier||'—')}</div>
-          ${usageHtml}
+      return `<div class="va-batch">
+        <div class="va-batch-row1">
+          <div>
+            <div class="va-batch-sup">${escapeHtml(b.supplier||'—')}</div>
+            <div class="va-batch-date">${escapeHtml(b.date||'—')}</div>
+          </div>
+          <div>
+            <div class="va-batch-qty">${b.qtyLeft} / ${b.qty} ${escapeHtml(b.unit)}</div>
+            <div class="va-batch-price">${b.costPerUnit.toLocaleString()} грн/${escapeHtml(b.unit)} · ${Math.round(b.qty*b.costPerUnit).toLocaleString()} грн</div>
+          </div>
         </div>
-        <div class="wh-batch-qty">${b.qtyLeft} / ${b.qty} ${escapeHtml(b.unit)}</div>
-        <div class="wh-batch-cost">${b.costPerUnit.toLocaleString()} грн/${escapeHtml(b.unit)}</div>
-        <div class="wh-batch-cost">${Math.round(b.qty*b.costPerUnit).toLocaleString()} грн</div>
-        <div class="wh-batch-actions">
-          ${b.qtyLeft > 0 && state.role==='admin' ? `<button class="ja-btn" onclick="openWarehouseUsageModal('${escapeHtml(b.id)}')">Списати</button>` : ''}
-          ${b.qtyLeft >= b.qty && state.role==='admin' ? `<button class="ja-btn danger" onclick="deleteWarehouseItemBtn('${escapeHtml(b.id)}')">✕</button>` : ''}
+        <div class="va-progress"><div class="va-progress-fill" style="width:${leftPct}%;background:${barColor}"></div></div>
+        ${usageTags ? `<div style="margin-bottom:6px">${usageTags}</div>` : ''}
+        <div class="va-batch-foot">
+          <div></div>
+          <div class="va-batch-btns">
+            ${b.qtyLeft > 0 && state.role==='admin' ? `<button class="va-btn-sm write" onclick="openWarehouseUsageModal('${escapeHtml(b.id)}')">Списати</button>` : ''}
+            ${b.qtyLeft >= b.qty && state.role==='admin' ? `<button class="va-btn-sm del" onclick="deleteWarehouseItemBtn('${escapeHtml(b.id)}')">Видалити</button>` : ''}
+          </div>
         </div>
       </div>`;
     }).join('');
 
-    return `<div class="wh-group">
-      <div class="wh-group-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-        <span class="wh-group-name">${escapeHtml(g.partName)}</span>
-        <span class="wh-group-stock ${stockClass}">Залишок: <b>${Math.round(totalLeft*100)/100} ${escapeHtml(g.unit)}</b></span>
-        <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;color:var(--text3);flex-shrink:0"><polyline points="6,9 12,15 18,9"/></svg>
+    return `<div class="va-group">
+      <div class="va-group-hdr" onclick="this.querySelector('.va-chevron').style.transform=this.nextElementSibling.classList.toggle('open')?'rotate(90deg)':'';this.nextElementSibling.classList.toggle('open');">
+        <span class="va-group-name">${escapeHtml(g.partName)}</span>
+        <span class="va-group-badge ${badgeClass}">${badgeText}</span>
+        <span class="va-chevron">›</span>
       </div>
-      <div class="wh-group-body">${batchRows}</div>
+      <div class="va-group-body">${batchRows}</div>
     </div>`;
   }).join('');
 }
