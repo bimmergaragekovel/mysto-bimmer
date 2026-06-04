@@ -2,6 +2,9 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BimmerGarage — СТО</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -490,6 +493,118 @@ a{color:inherit;text-decoration:none}
   .pst-head,.pst-row{grid-template-columns:1fr 60px 80px}
   .pst-head span:nth-child(3),.pst-row span:nth-child(3){display:none}
 }
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Exo 2',Arial,sans-serif;background:#fff;color:#111;padding:11mm 13mm;font-size:10px;line-height:1.35}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3mm}
+  .brand{font-size:17px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+  .brand-sub{font-size:8px;color:#888;margin-top:1px}
+  .mstripe{display:flex;gap:2px;margin-top:2px}
+  .mstripe span{display:block;height:2px;width:14px;border-radius:1px}
+  .doc-meta{text-align:right;font-size:9px;color:#666;line-height:1.5}
+  .doc-title{font-size:12px;font-weight:800;color:#cc0000;letter-spacing:.04em}
+  .red-line{border:none;border-top:2px solid #cc0000;margin:2mm 0}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8mm;margin:2.5mm 0}
+  .field-row{display:flex;gap:2mm;margin-bottom:1mm;font-size:9px}
+  .field-label{font-weight:700;min-width:16mm;color:#777;flex-shrink:0}
+  .field-val{color:#111}
+  .note-row{font-size:8px;color:#888;margin:1mm 0;font-style:italic}
+  .section-title{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#cc0000;margin:2.5mm 0 1mm;padding-left:3px;border-left:2px solid #cc0000}
+  table{width:100%;border-collapse:collapse;margin-bottom:0}
+  th{text-align:left;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:.8mm 1.5mm;border-bottom:1px solid #ddd;background:#fafafa}
+  td{padding:.9mm 1.5mm;border-bottom:1px solid #f0f0f0;font-size:9px;vertical-align:middle}
+  td.r{text-align:right;font-weight:600;white-space:nowrap}
+  .sub td{font-weight:700;border-top:1.5px solid #bbb;border-bottom:none;background:#f5f5f5;font-size:9px}
+  .total-block{margin-top:2.5mm;padding:2mm 3mm;border:1.5px solid #ddd;border-radius:2px}
+  .t-row{display:flex;justify-content:space-between;align-items:center;padding:.7mm 0}
+  .t-label{font-size:9px;font-weight:600;color:#555}
+  .t-val{font-size:9.5px;font-weight:700;color:#111}
+  .grand-row{display:flex;justify-content:space-between;align-items:center;padding:1.5mm 0 0;margin-top:1mm;border-top:2px solid #cc0000}
+  .grand-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+  .grand-val{font-size:15px;font-weight:800;color:#cc0000}
+  .debt-val{font-size:12px;font-weight:800;color:#cc0000}
+  .sign-row{display:flex;justify-content:space-between;margin-top:7mm;font-size:9px;color:#555}
+  .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
+  @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
+/* ===================== WAREHOUSE ===================== */
+
+/* Period row */
+.period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.period-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
+.period-row input{flex:1;min-width:110px}
+
+/* KPI strip */
+.va-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:14px}
+.va-strip-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.va-strip-cell.hl{border-color:#cc000055;background:#180808}
+.va-strip-cell.good{border-color:#1a3a1a}
+.va-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px}
+.va-num{font-size:16px;font-weight:900;line-height:1;color:var(--text)}
+.va-num.r{color:var(--red2)}.va-num.g{color:var(--green2)}
+.va-cur{font-size:9px;font-weight:500;color:var(--text4)}
+
+/* Section title */
+.va-sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin:14px 0 8px}
+
+/* Supplier cards */
+.va-sup{display:flex;align-items:center;gap:10px;padding:10px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:5px}
+.va-sup-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.va-sup-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
+.va-sup-sub{font-size:10px;color:var(--text4);margin-top:2px}
+.va-sup-right{text-align:right;flex-shrink:0}
+.va-sup-debt{font-size:14px;font-weight:900;color:var(--red2)}
+.va-sup-debt.ok{color:var(--green2);font-size:16px}
+.va-sup-paid{font-size:10px;color:var(--green2);margin-top:1px}
+
+/* Info cards */
+.va-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:14px 0}
+.va-info-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
+.va-info-v{font-size:13px;font-weight:800;margin-top:3px}
+.va-info-v.am{color:var(--amber)}.va-info-v.bl{color:var(--blue)}
+.va-itag{font-size:8px;color:var(--text4);background:var(--bg4);padding:1px 4px;border-radius:3px;vertical-align:middle}
+
+/* Payment block */
+.va-pay{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:16px}
+.va-pay select,.va-pay input{width:100%;background:var(--bg4);color:var(--text);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;margin-bottom:6px}
+.va-pay-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:9px;font-size:12px;font-weight:700;font-family:inherit;width:100%;cursor:pointer}
+
+/* List header */
+.va-list-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.va-list-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.va-add-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:6px 11px;font-size:10px;font-weight:700;font-family:inherit;cursor:pointer}
+
+/* Товарні групи */
+.va-group{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
+.va-group-hdr{display:flex;align-items:center;padding:11px 12px;gap:8px;cursor:pointer;user-select:none}
+.va-group-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
+.va-group-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid}
+.va-group-badge.ok{color:var(--green2);border-color:#27c47a44;background:#0a1a0f}
+.va-group-badge.lo{color:var(--amber);border-color:#f0a02044;background:#1a1000}
+.va-group-badge.em{color:var(--red2);border-color:#cc000044;background:#180808}
+.va-chevron{color:var(--text4);font-size:14px;flex-shrink:0;transition:.2s}
+.va-group-body{display:none;border-top:1px solid var(--border)}
+.va-group-body.open{display:block}
+
+/* Партія */
+.va-batch{padding:11px 12px;border-bottom:1px solid var(--border)}
+.va-batch:last-child{border-bottom:none}
+.va-batch-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.va-batch-sup{font-size:12px;font-weight:700;color:var(--text2)}
+.va-batch-date{font-size:10px;color:var(--text4);margin-top:2px}
+.va-batch-qty{font-size:14px;font-weight:900;color:var(--text);text-align:right}
+.va-batch-price{font-size:10px;color:var(--text4);text-align:right;margin-top:2px}
+.va-progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:8px}
+.va-progress-fill{height:100%;border-radius:2px;transition:.3s}
+.va-batch-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+.va-usage{font-size:10px;color:var(--text4);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.va-usage::before{content:'↗';color:var(--red2);font-size:9px}
+.va-batch-btns{display:flex;gap:5px;flex-shrink:0}
+.va-btn-sm{font-size:10px;font-weight:700;border:none;border-radius:6px;padding:5px 10px;font-family:inherit;cursor:pointer}
+.va-btn-sm.write{background:#0a1e0a;color:var(--green2)}
+.va-btn-sm.del{background:#1a0808;color:var(--red2)}
+
 </style>
 </head>
 <body>
@@ -1230,10 +1345,13 @@ async function initApp() {
     renderRepairs();
     initStatDates();
     initWarehouseDates();
-    initWarehouseDates();
     // Фонове оновлення без лоадера
     api({ action: 'initData' }).then(res => {
-      if (res && res.ok) { applyData(res); saveCache(res); renderRepairs(); }
+      if (res && res.ok) {
+        applyData(res); saveCache(res); renderRepairs();
+        // Якщо вкладка Склад активна — оновити і її
+        if (document.getElementById('warehouse-tab')?.style.display !== 'none') renderWarehouse();
+      }
     }).catch(() => {});
   } else {
     showLoader();
@@ -1244,6 +1362,7 @@ async function initApp() {
     hideLoader();
     renderRepairs();
     initStatDates();
+    initWarehouseDates();
   }
 }
 
@@ -2355,117 +2474,7 @@ async function sharePDF(id) {
 <html>
 <head>
 <meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Exo 2',Arial,sans-serif;background:#fff;color:#111;padding:11mm 13mm;font-size:10px;line-height:1.35}
-  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3mm}
-  .brand{font-size:17px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
-  .brand-sub{font-size:8px;color:#888;margin-top:1px}
-  .mstripe{display:flex;gap:2px;margin-top:2px}
-  .mstripe span{display:block;height:2px;width:14px;border-radius:1px}
-  .doc-meta{text-align:right;font-size:9px;color:#666;line-height:1.5}
-  .doc-title{font-size:12px;font-weight:800;color:#cc0000;letter-spacing:.04em}
-  .red-line{border:none;border-top:2px solid #cc0000;margin:2mm 0}
-  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8mm;margin:2.5mm 0}
-  .field-row{display:flex;gap:2mm;margin-bottom:1mm;font-size:9px}
-  .field-label{font-weight:700;min-width:16mm;color:#777;flex-shrink:0}
-  .field-val{color:#111}
-  .note-row{font-size:8px;color:#888;margin:1mm 0;font-style:italic}
-  .section-title{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#cc0000;margin:2.5mm 0 1mm;padding-left:3px;border-left:2px solid #cc0000}
-  table{width:100%;border-collapse:collapse;margin-bottom:0}
-  th{text-align:left;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:.8mm 1.5mm;border-bottom:1px solid #ddd;background:#fafafa}
-  td{padding:.9mm 1.5mm;border-bottom:1px solid #f0f0f0;font-size:9px;vertical-align:middle}
-  td.r{text-align:right;font-weight:600;white-space:nowrap}
-  .sub td{font-weight:700;border-top:1.5px solid #bbb;border-bottom:none;background:#f5f5f5;font-size:9px}
-  .total-block{margin-top:2.5mm;padding:2mm 3mm;border:1.5px solid #ddd;border-radius:2px}
-  .t-row{display:flex;justify-content:space-between;align-items:center;padding:.7mm 0}
-  .t-label{font-size:9px;font-weight:600;color:#555}
-  .t-val{font-size:9.5px;font-weight:700;color:#111}
-  .grand-row{display:flex;justify-content:space-between;align-items:center;padding:1.5mm 0 0;margin-top:1mm;border-top:2px solid #cc0000}
-  .grand-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
-  .grand-val{font-size:15px;font-weight:800;color:#cc0000}
-  .debt-val{font-size:12px;font-weight:800;color:#cc0000}
-  .sign-row{display:flex;justify-content:space-between;margin-top:7mm;font-size:9px;color:#555}
-  .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
-  @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
-/* ===================== WAREHOUSE ===================== */
 
-/* Period row */
-.period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.period-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
-.period-row input{flex:1;min-width:110px}
-
-/* KPI strip */
-.va-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:14px}
-.va-strip-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
-.va-strip-cell.hl{border-color:#cc000055;background:#180808}
-.va-strip-cell.good{border-color:#1a3a1a}
-.va-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px}
-.va-num{font-size:16px;font-weight:900;line-height:1;color:var(--text)}
-.va-num.r{color:var(--red2)}.va-num.g{color:var(--green2)}
-.va-cur{font-size:9px;font-weight:500;color:var(--text4)}
-
-/* Section title */
-.va-sec{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin:14px 0 8px}
-
-/* Supplier cards */
-.va-sup{display:flex;align-items:center;gap:10px;padding:10px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:5px}
-.va-sup-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.va-sup-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
-.va-sup-sub{font-size:10px;color:var(--text4);margin-top:2px}
-.va-sup-right{text-align:right;flex-shrink:0}
-.va-sup-debt{font-size:14px;font-weight:900;color:var(--red2)}
-.va-sup-debt.ok{color:var(--green2);font-size:16px}
-.va-sup-paid{font-size:10px;color:var(--green2);margin-top:1px}
-
-/* Info cards */
-.va-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:14px 0}
-.va-info-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
-.va-info-v{font-size:13px;font-weight:800;margin-top:3px}
-.va-info-v.am{color:var(--amber)}.va-info-v.bl{color:var(--blue)}
-.va-itag{font-size:8px;color:var(--text4);background:var(--bg4);padding:1px 4px;border-radius:3px;vertical-align:middle}
-
-/* Payment block */
-.va-pay{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:16px}
-.va-pay select,.va-pay input{width:100%;background:var(--bg4);color:var(--text);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;margin-bottom:6px}
-.va-pay-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:9px;font-size:12px;font-weight:700;font-family:inherit;width:100%;cursor:pointer}
-
-/* List header */
-.va-list-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.va-list-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
-.va-add-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:6px 11px;font-size:10px;font-weight:700;font-family:inherit;cursor:pointer}
-
-/* Товарні групи */
-.va-group{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
-.va-group-hdr{display:flex;align-items:center;padding:11px 12px;gap:8px;cursor:pointer;user-select:none}
-.va-group-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
-.va-group-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid}
-.va-group-badge.ok{color:var(--green2);border-color:#27c47a44;background:#0a1a0f}
-.va-group-badge.lo{color:var(--amber);border-color:#f0a02044;background:#1a1000}
-.va-group-badge.em{color:var(--red2);border-color:#cc000044;background:#180808}
-.va-chevron{color:var(--text4);font-size:14px;flex-shrink:0;transition:.2s}
-.va-group-body{display:none;border-top:1px solid var(--border)}
-.va-group-body.open{display:block}
-
-/* Партія */
-.va-batch{padding:11px 12px;border-bottom:1px solid var(--border)}
-.va-batch:last-child{border-bottom:none}
-.va-batch-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
-.va-batch-sup{font-size:12px;font-weight:700;color:var(--text2)}
-.va-batch-date{font-size:10px;color:var(--text4);margin-top:2px}
-.va-batch-qty{font-size:14px;font-weight:900;color:var(--text);text-align:right}
-.va-batch-price{font-size:10px;color:var(--text4);text-align:right;margin-top:2px}
-.va-progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:8px}
-.va-progress-fill{height:100%;border-radius:2px;transition:.3s}
-.va-batch-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
-.va-usage{font-size:10px;color:var(--text4);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;display:inline-flex;align-items:center;gap:4px;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.va-usage::before{content:'↗';color:var(--red2);font-size:9px}
-.va-batch-btns{display:flex;gap:5px;flex-shrink:0}
-.va-btn-sm{font-size:10px;font-weight:700;border:none;border-radius:6px;padding:5px 10px;font-family:inherit;cursor:pointer}
-.va-btn-sm.write{background:#0a1e0a;color:var(--green2)}
-.va-btn-sm.del{background:#1a0808;color:var(--red2)}
-</style>
 </head>
 <body>
   <div class="header">
@@ -4319,6 +4328,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-55</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-58</div>
 </body>
 </html>
