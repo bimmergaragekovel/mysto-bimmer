@@ -550,6 +550,7 @@ a{color:inherit;text-decoration:none}
         <button class="nb active" onclick="showTab('repairs',this)" id="tab-repairs">Ремонти</button>
         <button class="nb hidden" onclick="showTab('stats',this)" id="tab-stats">Статистика</button>
         <button class="nb hidden" onclick="showTab('settings',this)" id="tab-settings">Налаштування</button>
+        <button class="nb hidden" onclick="showTab('warehouse',this)" id="tab-warehouse">Склад</button>
       </div>
       <div class="topbar-right">
         <span class="user-badge" id="user-badge"></span>
@@ -562,6 +563,7 @@ a{color:inherit;text-decoration:none}
       <button class="nb active" onclick="showTab('repairs',this)" id="tab-repairs-m">Ремонти</button>
       <button class="nb hidden" onclick="showTab('stats',this)" id="tab-stats-m">Статистика</button>
       <button class="nb hidden" onclick="showTab('settings',this)" id="tab-settings-m">Налаштування</button>
+      <button class="nb hidden" onclick="showTab('warehouse',this)" id="tab-warehouse-m">Склад</button>
     </div>
   </div>
 
@@ -775,6 +777,125 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
+
+<!-- WAREHOUSE TAB -->
+<div class="main hidden" id="warehouse-tab" style="display:none">
+
+  <!-- Фільтр периоду -->
+  <div class="period-row" style="margin-bottom:16px">
+    <label>Період:</label>
+    <input type="date" id="wh-from">
+    <span style="color:var(--text3)">—</span>
+    <input type="date" id="wh-to">
+    <button class="fbadge active" onclick="renderWarehouse()">Оновити</button>
+  </div>
+
+  <!-- Фінанси складу -->
+  <div class="stat-panel" style="margin-bottom:16px">
+    <div class="stat-panel-title">Фінанси складу</div>
+    <div id="wh-finance"></div>
+  </div>
+
+  <!-- Список товарів на складі -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)">Товари на складі</div>
+    <button class="btn-p sm" onclick="openWarehouseAddModal()">+ Нова закупівля</button>
+  </div>
+  <div id="wh-list"></div>
+
+</div>
+
+<!-- WAREHOUSE ADD MODAL -->
+<div class="modal-overlay" id="wh-add-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-hdr">
+      <span class="modal-title">Нова закупівля на склад</span>
+      <button class="modal-close" onclick="closeModal('wh-add-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <div class="fl fw">
+          <label>Товар (з каталогу)</label>
+          <select id="wh-part-sel" onchange="onWhPartSelect()">
+            <option value="">— обрати товар —</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fl">
+          <label>Постачальник</label>
+          <select id="wh-supplier-sel">
+            <option value="">— обрати —</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label>Дата</label>
+          <input type="date" id="wh-date">
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fl">
+          <label>Кількість</label>
+          <input type="number" id="wh-qty" placeholder="0" min="0.01" step="0.01">
+        </div>
+        <div class="fl">
+          <label>Одиниця</label>
+          <input type="text" id="wh-unit" readonly style="background:var(--bg);color:var(--text3)">
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fl">
+          <label>Прихідна ціна за одиницю (грн)</label>
+          <input type="number" id="wh-cost" placeholder="0" min="0" step="0.01">
+        </div>
+        <div class="fl">
+          <label>Сума закупівлі</label>
+          <div id="wh-total-preview" style="padding:9px 12px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius);color:var(--green2);font-weight:700">0 грн</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-s" onclick="closeModal('wh-add-modal')">Скасувати</button>
+      <button class="btn-p" onclick="saveWarehouseItem()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<!-- WAREHOUSE USAGE MODAL -->
+<div class="modal-overlay" id="wh-usage-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hdr">
+      <span class="modal-title">Списати зі складу</span>
+      <button class="modal-close" onclick="closeModal('wh-usage-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:12px;font-size:13px;color:var(--text2)" id="wh-usage-info"></div>
+      <div class="fg">
+        <div class="fl fw">
+          <label>Ремонт</label>
+          <select id="wh-usage-repair">
+            <option value="">— обрати ремонт —</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fl">
+          <label>Кількість для списання</label>
+          <input type="number" id="wh-usage-qty" placeholder="0" min="0.01" step="0.01">
+        </div>
+        <div class="fl">
+          <label>Дата</label>
+          <input type="date" id="wh-usage-date">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-s" onclick="closeModal('wh-usage-modal')">Скасувати</button>
+      <button class="btn-p" onclick="confirmWarehouseUsage()">Списати</button>
+    </div>
+  </div>
+</div>
+
 <!-- REPAIR MODAL -->
 <div class="modal-overlay" id="repair-modal">
   <div class="modal">
@@ -883,6 +1004,7 @@ a{color:inherit;text-decoration:none}
             <select id="p-cat-sel" onchange="onPartCatSelect()">
               <option value="">— вибрати —</option>
             </select>
+            <div id="wh-stock-hint" style="font-size:11px;margin-top:3px;display:none"></div>
           </div>
           <div class="fl"><label>Або вручну</label><input type="text" id="p-name-custom" placeholder="Назва"></div>
         </div>
@@ -924,7 +1046,7 @@ a{color:inherit;text-decoration:none}
 // ============================================================
 // CONFIG — замін на свій URL від Apps Script
 // ============================================================
-let API_URL = localStorage.getItem('bg_api_url') || 'https://script.google.com/macros/s/AKfycbyrjGVJoWCWbH3SrcABqETxT32QJtu8FXvMR06YYuxrLbkBMwCN00WyM4-RuMKS4fQ9/exec';
+let API_URL = localStorage.getItem('bg_api_url') || 'https://script.google.com/macros/s/AKfycbz_lAMxg14GysIWyp6H-0ScooH2ypdpDWq1jXuDncKpvSnCl1Fn2jMyA7N_rHx9bIlw/exec';
 
 // ============================================================
 // STATE
@@ -943,6 +1065,9 @@ let state = {
   stockBatches:   [],
   supPayments:       [],
   salaryPayments:    [],
+  warehouseItems:    [],
+  warehouseUsage:    [],
+  warehousePayments: [],
   coderPayments:     [],
   config:            {},
   filter: 'all',
@@ -1066,6 +1191,9 @@ function applyData(data) {
   if (data.salaryPayments  != null) state.salaryPayments  = data.salaryPayments  || [];
   if (data.coderPayments   != null) state.coderPayments   = data.coderPayments   || [];
   if (data.config          != null) state.config          = data.config          || {};
+  if (data.warehouseItems    != null) state.warehouseItems    = data.warehouseItems    || [];
+  if (data.warehouseUsage    != null) state.warehouseUsage    = data.warehouseUsage    || [];
+  if (data.warehousePayments != null) state.warehousePayments = data.warehousePayments || [];
   renderStockIndicators();
 }
 
@@ -1092,7 +1220,7 @@ async function initApp() {
   document.getElementById('user-badge').textContent = state.login + ' · ' + roleLabel(role);
 
   if (role === 'admin' || role === 'viewer') { showEl('tab-stats'); showEl('tab-stats-m'); }
-  if (role === 'admin') { showEl('tab-settings'); showEl('tab-settings-m'); showEl('btn-add-repair'); }
+  if (role === 'admin') { showEl('tab-settings'); showEl('tab-settings-m'); showEl('btn-add-repair'); showEl('tab-warehouse'); showEl('tab-warehouse-m'); }
   if (role === 'master' || role === 'coder') showEl('btn-add-repair');
 
   document.querySelectorAll('.admin-only').forEach(el => {
@@ -1104,6 +1232,8 @@ async function initApp() {
     applyData(cached);
     renderRepairs();
     initStatDates();
+    initWarehouseDates();
+    initWarehouseDates();
     // Фонове оновлення без лоадера
     api({ action: 'initData' }).then(res => {
       if (res && res.ok) { applyData(res); saveCache(res); renderRepairs(); }
@@ -1128,12 +1258,13 @@ function roleLabel(r) {
 // TABS
 // ============================================================
 function showTab(name, el) {
+  if (name === 'warehouse') { renderWarehouse(); }
   // Синхронізуємо обидві навігації (desktop + mobile)
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   // Активуємо відповідні кнопки в обох рядках
-  const ids = { repairs: ['tab-repairs','tab-repairs-m'], stats: ['tab-stats','tab-stats-m'], settings: ['tab-settings','tab-settings-m'] };
+  const ids = { repairs: ['tab-repairs','tab-repairs-m'], stats: ['tab-stats','tab-stats-m'], settings: ['tab-settings','tab-settings-m'], warehouse: ['tab-warehouse','tab-warehouse-m'] };
   (ids[name] || []).forEach(id => { const b = document.getElementById(id); if(b) b.classList.add('active'); });
-  ['repairs','stats','settings'].forEach(t => {
+  ['repairs','stats','settings','warehouse'].forEach(t => {
     const el = document.getElementById(t + '-tab');
     if (el) el.style.display = (t === name) ? '' : 'none';
   });
@@ -1863,6 +1994,19 @@ function onPartCatSelect() {
       }
     }
   }
+
+  // Підказка наявності на складі
+  const whStock = getWarehouseStock(opt.value);
+  const whHint  = document.getElementById('wh-stock-hint');
+  if (whHint) {
+    if (whStock) {
+      whHint.innerHTML = `<span style="color:var(--green2)">📦 На складі: <b>${whStock.total} ${escapeHtml(whStock.unit)}</b></span>`;
+      whHint.style.display = '';
+    } else {
+      whHint.innerHTML = '<span style="color:var(--text4)">На складі: немає</span>';
+      whHint.style.display = '';
+    }
+  }
 }
 
 function setMuType(type) {
@@ -2248,6 +2392,44 @@ async function sharePDF(id) {
   .sign-row{display:flex;justify-content:space-between;margin-top:7mm;font-size:9px;color:#555}
   .sign-line{display:inline-block;width:48mm;border-bottom:1px solid #aaa;margin-left:2mm}
   @media print{body{padding:9mm 11mm}@page{margin:0;size:A4}}
+/* ===================== WAREHOUSE ===================== */
+.wh-group{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);margin-bottom:10px;overflow:hidden}
+.wh-group-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
+.wh-group-name{font-size:14px;font-weight:700;color:var(--text);flex:1}
+.wh-group-stock{font-size:12px;color:var(--text3)}
+.wh-group-stock b{color:var(--green2)}
+.wh-group-stock.low b{color:var(--amber)}
+.wh-group-stock.empty b{color:var(--red2)}
+.wh-group-body{display:none;border-top:1px solid var(--border);padding:0}
+.wh-group-body.open{display:block}
+.wh-batch{display:grid;grid-template-columns:1fr auto auto auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px}
+.wh-batch:last-child{border-bottom:none}
+.wh-batch-date{color:var(--text3);font-size:11px}
+.wh-batch-sup{color:var(--text2);font-weight:600}
+.wh-batch-qty{text-align:right;font-weight:700;color:var(--text)}
+.wh-batch-cost{text-align:right;color:var(--text3)}
+.wh-batch-actions{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+.wh-usage-tag{font-size:10px;color:var(--text4);padding:2px 6px;background:var(--bg4);border-radius:3px;border:1px solid var(--border2)}
+.wh-finance-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.wh-finance-grid{grid-template-columns:1fr}}
+.wh-fin-block{background:var(--bg4);border-radius:var(--radius);padding:12px}
+.wh-fin-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px}
+.wh-fin-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0}
+.wh-fin-label{color:var(--text3)}
+.wh-fin-val{font-weight:700;color:var(--text)}
+.wh-fin-val.green{color:var(--green2)}
+.wh-fin-val.red{color:var(--red2)}
+.wh-fin-val.amber{color:var(--amber)}
+.wh-fin-divider{border:none;border-top:1px solid var(--border);margin:6px 0}
+.wh-fin-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;padding-top:4px}
+.wh-sup-detail{font-size:11px;color:var(--text4);padding-left:8px;margin-top:2px}
+.wh-pay-row{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.wh-pay-input{width:90px;font-size:12px;padding:5px 8px}
+.wh-pay-sup{width:130px;font-size:12px;padding:5px 8px}
+@media(max-width:500px){
+  .wh-batch{grid-template-columns:1fr 1fr;gap:6px}
+}
+
 </style>
 </head>
 <body>
@@ -3717,6 +3899,354 @@ function toggleCatSection(headerEl) {
 
 function toggleCatRow(rowEl) {
   if (rowEl) rowEl.classList.toggle('open');
+}
+
+
+// ============================================================
+// WAREHOUSE — Склад
+// ============================================================
+
+let _whCurrentItemId = null; // для модалки списання
+
+function initWarehouseDates() {
+  const now = new Date();
+  const y   = now.getFullYear();
+  const m   = String(now.getMonth() + 1).padStart(2, '0');
+  document.getElementById('wh-from').value = `${y}-${m}-01`;
+  document.getElementById('wh-to').value   = now.toISOString().split('T')[0];
+}
+
+// ---- Головний рендер вкладки Склад ----
+function renderWarehouse() {
+  renderWarehouseFinance();
+  renderWarehouseList();
+}
+
+// ---- Фінанси складу ----
+function renderWarehouseFinance() {
+  const el   = document.getElementById('wh-finance');
+  if (!el) return;
+  const from = document.getElementById('wh-from')?.value || '';
+  const to   = document.getElementById('wh-to')?.value   || '';
+
+  const items    = state.warehouseItems    || [];
+  const payments = state.warehousePayments || [];
+  const usage    = state.warehouseUsage    || [];
+
+  // Загальна закупівля (всі партії)
+  const totalBought = items.reduce((s, i) => s + (i.qty * i.costPerUnit), 0);
+
+  // Сплачено по постачальниках
+  const paidBySupplier = {};
+  payments.forEach(p => {
+    paidBySupplier[p.supplier] = (paidBySupplier[p.supplier] || 0) + (p.amount || 0);
+  });
+  const totalPaid = Object.values(paidBySupplier).reduce((s, v) => s + v, 0);
+  const totalDebt = Math.round(totalBought - totalPaid);
+
+  // Списано в ремонти (за собів.)
+  const totalUsed = usage.reduce((s, u) => {
+    const item = items.find(i => i.id === u.warehouseId);
+    return s + (item ? item.costPerUnit * u.qty : 0);
+  }, 0);
+
+  // Залишок на складі (за собів.)
+  const totalLeft = items.reduce((s, i) => s + (i.qtyLeft * i.costPerUnit), 0);
+
+  // Закуплено по постачальниках
+  const boughtBySupplier = {};
+  items.forEach(i => {
+    boughtBySupplier[i.supplier] = (boughtBySupplier[i.supplier] || 0) + (i.qty * i.costPerUnit);
+  });
+
+  const supRows = Object.entries(boughtBySupplier).sort((a,b)=>b[1]-a[1]).map(([s, bought]) => {
+    const paid = paidBySupplier[s] || 0;
+    const debt = Math.round(bought - paid);
+    return `<div class="wh-fin-row">
+      <span class="wh-fin-label">${escapeHtml(s)}</span>
+      <span class="wh-fin-val ${debt>0?'red':''}">${debt>0?'борг: '+Math.abs(debt).toLocaleString()+' грн':'✓ '+Math.round(paid).toLocaleString()+' грн'}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="wh-finance-grid">
+      <div class="wh-fin-block">
+        <div class="wh-fin-title">Закупівлі та борг</div>
+        <div class="wh-fin-row">
+          <span class="wh-fin-label">Закуплено товарів:</span>
+          <span class="wh-fin-val">${Math.round(totalBought).toLocaleString()} грн</span>
+        </div>
+        <div class="wh-fin-row" style="padding-top:4px">
+          <span class="wh-fin-label" style="font-weight:700">Сплачено постачальникам:</span>
+          <span class="wh-fin-val green">${Math.round(totalPaid).toLocaleString()} грн</span>
+        </div>
+        ${supRows}
+        <hr class="wh-fin-divider">
+        <div class="wh-fin-total">
+          <span>Борг:</span>
+          <span style="color:${totalDebt>0?'var(--red2)':'var(--green2)'}">${totalDebt.toLocaleString()} грн</span>
+        </div>
+      </div>
+      <div class="wh-fin-block">
+        <div class="wh-fin-title">Рух товарів</div>
+        <div class="wh-fin-row">
+          <span class="wh-fin-label">Списано в ремонти:</span>
+          <span class="wh-fin-val amber">${Math.round(totalUsed).toLocaleString()} грн <span style="font-size:10px;font-weight:400">(інформативно)</span></span>
+        </div>
+        <hr class="wh-fin-divider">
+        <div class="wh-fin-total">
+          <span>Залишок на складі:</span>
+          <span style="color:var(--blue)">${Math.round(totalLeft).toLocaleString()} грн <span style="font-size:10px;font-weight:400">(інформативно)</span></span>
+        </div>
+        <div style="margin-top:12px">
+          <div class="wh-fin-title">Оплатити борг</div>
+          <div class="wh-pay-row">
+            <select class="wh-pay-sup" id="wh-pay-supplier">
+              <option value="">— постачальник —</option>
+              ${Object.keys(boughtBySupplier).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
+            </select>
+            <input type="number" class="wh-pay-input" id="wh-pay-amount" placeholder="сума" min="0">
+            <button class="btn-p sm" onclick="addWarehousePayment()">+ Сплатити</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ---- Список товарів ----
+function renderWarehouseList() {
+  const el   = document.getElementById('wh-list');
+  if (!el) return;
+  const from = document.getElementById('wh-from')?.value || '';
+  const to   = document.getElementById('wh-to')?.value   || '';
+
+  const items = state.warehouseItems    || [];
+  const usage = state.warehouseUsage    || [];
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty"><p>Склад порожній. Додай першу закупівлю.</p></div>';
+    return;
+  }
+
+  // Групуємо по назві товару
+  const groups = {};
+  items.forEach(i => {
+    // Правило відображення: ховаємо якщо партія поза періодом І залишок = 0
+    const inPeriod = !from || !to || (i.date >= from && i.date <= to);
+    if (!inPeriod && i.qtyLeft <= 0) return;
+
+    if (!groups[i.partName]) groups[i.partName] = { partName: i.partName, unit: i.unit, batches: [] };
+    groups[i.partName].batches.push(i);
+  });
+
+  if (!Object.keys(groups).length) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0;text-align:center">Немає товарів за обраний період</div>';
+    return;
+  }
+
+  el.innerHTML = Object.values(groups).map(g => {
+    const totalLeft = g.batches.reduce((s,b) => s+(b.qtyLeft||0), 0);
+    const totalQty  = g.batches.reduce((s,b) => s+(b.qty||0), 0);
+    const stockClass = totalLeft <= 0 ? 'empty' : totalLeft < totalQty * 0.2 ? 'low' : '';
+
+    const batchRows = g.batches.map(b => {
+      // Списання по цій партії
+      const bUsage = usage.filter(u => u.warehouseId === b.id);
+      const usageHtml = bUsage.map(u => `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+          <span class="wh-usage-tag">↗ ${escapeHtml(u.repairLabel||'Ремонт')} — ${u.qty} ${escapeHtml(b.unit)}</span>
+          ${state.role==='admin'?`<button class="btn-d" style="font-size:10px;padding:2px 6px" onclick="deleteWarehouseUsage('${escapeHtml(u.id)}')">✕</button>`:''}
+        </div>`).join('');
+
+      return `<div class="wh-batch">
+        <div>
+          <div class="wh-batch-date">${escapeHtml(b.date||'—')}</div>
+          <div class="wh-batch-sup">${escapeHtml(b.supplier||'—')}</div>
+          ${usageHtml}
+        </div>
+        <div class="wh-batch-qty">${b.qtyLeft} / ${b.qty} ${escapeHtml(b.unit)}</div>
+        <div class="wh-batch-cost">${b.costPerUnit.toLocaleString()} грн/${escapeHtml(b.unit)}</div>
+        <div class="wh-batch-cost">${Math.round(b.qty*b.costPerUnit).toLocaleString()} грн</div>
+        <div class="wh-batch-actions">
+          ${b.qtyLeft > 0 && state.role==='admin' ? `<button class="ja-btn" onclick="openWarehouseUsageModal('${escapeHtml(b.id)}')">Списати</button>` : ''}
+          ${b.qtyLeft >= b.qty && state.role==='admin' ? `<button class="ja-btn danger" onclick="deleteWarehouseItemBtn('${escapeHtml(b.id)}')">✕</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="wh-group">
+      <div class="wh-group-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span class="wh-group-name">${escapeHtml(g.partName)}</span>
+        <span class="wh-group-stock ${stockClass}">Залишок: <b>${Math.round(totalLeft*100)/100} ${escapeHtml(g.unit)}</b></span>
+        <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;color:var(--text3);flex-shrink:0"><polyline points="6,9 12,15 18,9"/></svg>
+      </div>
+      <div class="wh-group-body">${batchRows}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Відкрити модалку нової закупівлі ----
+function openWarehouseAddModal() {
+  // Заповнити селект товарів з каталогу
+  const partSel = document.getElementById('wh-part-sel');
+  partSel.innerHTML = '<option value="">— обрати товар —</option>' +
+    (state.parts||[]).map(p => `<option value="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}" data-unit="${escapeHtml(p.unit||'шт')}">${escapeHtml(p.name)} (${escapeHtml(p.unit||'шт')})</option>`).join('');
+
+  // Заповнити постачальників
+  const supSel = document.getElementById('wh-supplier-sel');
+  supSel.innerHTML = '<option value="">— обрати —</option>' +
+    (state.suppliers||[]).map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+
+  // Дата = сьогодні
+  document.getElementById('wh-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('wh-qty').value  = '';
+  document.getElementById('wh-cost').value = '';
+  document.getElementById('wh-unit').value = '';
+  document.getElementById('wh-total-preview').textContent = '0 грн';
+
+  openModal('wh-add-modal');
+}
+
+function onWhPartSelect() {
+  const sel  = document.getElementById('wh-part-sel');
+  const opt  = sel.options[sel.selectedIndex];
+  document.getElementById('wh-unit').value = opt.dataset.unit || 'шт';
+  updateWhTotalPreview();
+}
+
+function updateWhTotalPreview() {
+  const qty  = parseFloat(document.getElementById('wh-qty').value)  || 0;
+  const cost = parseFloat(document.getElementById('wh-cost').value) || 0;
+  document.getElementById('wh-total-preview').textContent = Math.round(qty * cost).toLocaleString() + ' грн';
+}
+
+async function saveWarehouseItem() {
+  const sel      = document.getElementById('wh-part-sel');
+  const opt      = sel.options[sel.selectedIndex];
+  const partId   = sel.value;
+  const partName = opt?.dataset?.name || '';
+  const unit     = document.getElementById('wh-unit').value || 'шт';
+  const supplier = document.getElementById('wh-supplier-sel').value;
+  const date     = document.getElementById('wh-date').value;
+  const qty      = parseFloat(document.getElementById('wh-qty').value)  || 0;
+  const cost     = parseFloat(document.getElementById('wh-cost').value) || 0;
+
+  if (!partId)   { toast('Оберіть товар', 'error'); return; }
+  if (!supplier) { toast('Оберіть постачальника', 'error'); return; }
+  if (!qty)      { toast('Вкажіть кількість', 'error'); return; }
+  if (!cost)     { toast('Вкажіть прихідну ціну', 'error'); return; }
+  if (!date)     { toast('Вкажіть дату', 'error'); return; }
+
+  showLoader();
+  const res = await api({ action: 'saveWarehouseItem', item: { partId, partName, unit, supplier, date, qty, costPerUnit: cost } });
+  hideLoader();
+  if (!res.ok) { toast(res.error || 'Помилка', 'error'); return; }
+  closeModal('wh-add-modal');
+  toast('Закупівлю збережено');
+  const fresh = await api({ action: 'initData' });
+  if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
+}
+
+// ---- Списання ----
+function openWarehouseUsageModal(itemId) {
+  _whCurrentItemId = itemId;
+  const item = (state.warehouseItems||[]).find(i => i.id === itemId);
+  if (!item) return;
+
+  document.getElementById('wh-usage-info').innerHTML =
+    `<b>${escapeHtml(item.partName)}</b> · ${escapeHtml(item.supplier)} · ${escapeHtml(item.date)}<br>` +
+    `Залишок: <b style="color:var(--green2)">${item.qtyLeft} ${escapeHtml(item.unit)}</b> · ` +
+    `${item.costPerUnit.toLocaleString()} грн/${escapeHtml(item.unit)}`;
+
+  // Заповнити список ремонтів
+  const repSel = document.getElementById('wh-usage-repair');
+  repSel.innerHTML = '<option value="">— обрати ремонт —</option>' +
+    (state.repairs||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(j =>
+      `<option value="${escapeHtml(String(j.id))}" data-label="${escapeHtml(j.car+(j.client?' — '+j.client:'')+(j.date?' — '+j.date:''))}">` +
+      `${escapeHtml(j.car)}${j.client?' — '+escapeHtml(j.client):''}${j.date?' — '+escapeHtml(j.date):''}</option>`
+    ).join('');
+
+  document.getElementById('wh-usage-qty').value  = '';
+  document.getElementById('wh-usage-date').value = new Date().toISOString().split('T')[0];
+  openModal('wh-usage-modal');
+}
+
+async function confirmWarehouseUsage() {
+  const itemId   = _whCurrentItemId;
+  const repSel   = document.getElementById('wh-usage-repair');
+  const repairId = repSel.value;
+  const repOpt   = repSel.options[repSel.selectedIndex];
+  const qty      = parseFloat(document.getElementById('wh-usage-qty').value) || 0;
+  const date     = document.getElementById('wh-usage-date').value;
+
+  if (!repairId) { toast('Оберіть ремонт', 'error'); return; }
+  if (!qty)      { toast('Вкажіть кількість', 'error'); return; }
+
+  const item = (state.warehouseItems||[]).find(i => i.id === itemId);
+  if (item && qty > item.qtyLeft) { toast(`Залишок тільки ${item.qtyLeft} ${item.unit}`, 'error'); return; }
+
+  showLoader();
+  const res = await api({ action: 'saveWarehouseUsage', item: {
+    warehouseId:  itemId,
+    repairId,
+    repairLabel:  repOpt?.dataset?.label || repOpt?.text || '',
+    qty,
+    date,
+  }});
+  hideLoader();
+  if (!res.ok) { toast(res.error || 'Помилка', 'error'); return; }
+  closeModal('wh-usage-modal');
+  toast('Списано зі складу');
+  const fresh = await api({ action: 'initData' });
+  if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
+}
+
+async function deleteWarehouseUsage(usageId) {
+  if (!confirm('Скасувати списання?')) return;
+  showLoader();
+  const res = await api({ action: 'deleteWarehouseUsage', id: usageId });
+  hideLoader();
+  if (!res.ok) { toast(res.error||'Помилка','error'); return; }
+  toast('Списання скасовано');
+  const fresh = await api({ action: 'initData' });
+  if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
+}
+
+async function deleteWarehouseItemBtn(itemId) {
+  if (!confirm('Видалити партію?')) return;
+  showLoader();
+  const res = await api({ action: 'deleteWarehouseItem', id: itemId });
+  hideLoader();
+  if (!res.ok) { toast(res.error||'Помилка','error'); return; }
+  toast('Партію видалено');
+  const fresh = await api({ action: 'initData' });
+  if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
+}
+
+async function addWarehousePayment() {
+  const supplier = document.getElementById('wh-pay-supplier').value;
+  const amount   = parseFloat(document.getElementById('wh-pay-amount').value) || 0;
+  if (!supplier) { toast('Оберіть постачальника', 'error'); return; }
+  if (!amount)   { toast('Вкажіть суму', 'error'); return; }
+  showLoader();
+  const res = await api({ action: 'saveWarehousePayment', item: {
+    supplier, amount, date: new Date().toISOString().split('T')[0]
+  }});
+  hideLoader();
+  if (!res.ok) { toast(res.error||'Помилка','error'); return; }
+  toast('Оплату збережено');
+  document.getElementById('wh-pay-amount').value = '';
+  const fresh = await api({ action: 'initData' });
+  if (fresh?.ok) { applyData(fresh); saveCache(fresh); renderWarehouse(); }
+}
+
+// Підказка наявності в формі ремонту
+function getWarehouseStock(partId) {
+  const items = (state.warehouseItems||[]).filter(i => i.partId === partId && i.qtyLeft > 0);
+  if (!items.length) return null;
+  const total = Math.round(items.reduce((s,i) => s+i.qtyLeft, 0) * 100) / 100;
+  const unit  = items[0].unit;
+  return { total, unit };
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
