@@ -2151,7 +2151,7 @@ function renderFormParts() {
         <div class="part-edit-grid">
           <div class="fl"><label>Кількість</label>
             <input type="number" value="${p.qty}" min="0.01" step="${p.unit==='шт'?'1':'0.1'}"
-              onchange="updateFormPart(${p.id},'qty',this.value)">
+              oninput="updateFormPart(${p.id},'qty',this.value)">
           </div>
           <div class="fl"><label>Постачальник</label>
             <select onchange="updateFormPart(${p.id},'supplier',this.value)">
@@ -2160,7 +2160,7 @@ function renderFormParts() {
           </div>
           <div class="fl admin-only"><label>Прих. ціна (грн)</label>
             <input type="number" value="${p.cost||''}" min="0" placeholder="0"
-              onchange="updateFormPartPrice(${p.id},'cost',this.value)">
+              oninput="updateFormPartPrice(${p.id},'cost',this.value)">
           </div>
           <div class="fl admin-only"><label>Націнка</label>
             <div style="display:flex;gap:4px">
@@ -2170,13 +2170,13 @@ function renderFormParts() {
               </div>
               <input type="number" value="${p.markup||''}" min="0" placeholder="0" style="flex:1"
                 id="pedit-markup-${p.id}"
-                onchange="updateFormPartPrice(${p.id},'markup',this.value)">
+                oninput="updateFormPartPrice(${p.id},'markup',this.value)">
             </div>
           </div>
           <div class="fl"><label>Ціна продажу (грн)</label>
             <input type="number" value="${p.sale||''}" min="0" placeholder="0"
               id="pedit-sale-${p.id}"
-              onchange="updateFormPart(${p.id},'sale',this.value)">
+              oninput="updateFormPart(${p.id},'sale',this.value)">
           </div>
         </div>
         <div style="font-size:12px;color:var(--green2);margin-top:4px" id="pedit-margin-${p.id}">
@@ -2291,6 +2291,9 @@ function calcFormTotal() {
 }
 
 async function saveRepair() {
+  // Знімаємо фокус з активного елемента щоб спрацював останній oninput
+  if (document.activeElement) document.activeElement.blur();
+
   const car = document.getElementById('f-car').value.trim();
   if (!car) { toast('Введіть марку авто', 'error'); return; }
   if (!state.formWorks.length && !state.formCodings.length && !state.formParts.length) {
@@ -4222,6 +4225,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-59</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-60</div>
 </body>
 </html>
