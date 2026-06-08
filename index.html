@@ -736,7 +736,23 @@ a{color:inherit;text-decoration:none}
       <div id="kasa-income-list"></div>
     </div>
     <div class="stat-panel" style="margin-bottom:12px">
-      <div class="stat-panel-title" style="color:#e05050">Витрати (постачальники + зарплати + ручні)</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div class="stat-panel-title" style="color:#e05050;margin-bottom:0">Витрати (постачальники + зарплати + ручні)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <select id="kasa-filter-type" onchange="renderExpenseList()" style="font-size:11px;padding:5px 8px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);border-radius:6px;width:auto">
+            <option value="">Всі типи</option>
+            <option value="Постачальник">Постачальник</option>
+            <option value="Зарплата">Зарплата</option>
+            <option value="Кодувальник">Кодувальник</option>
+            <option value="Ручний вивід">Ручний вивід</option>
+          </select>
+          <select id="kasa-filter-sup" onchange="renderExpenseList()" style="font-size:11px;padding:5px 8px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);border-radius:6px;width:auto">
+            <option value="">Всі постачальники</option>
+          </select>
+          <button onclick="clearExpenseFilters()" style="font-size:11px;padding:5px 10px;background:none;border:1px solid var(--border2);color:var(--text3);border-radius:6px;cursor:pointer;white-space:nowrap">✕ Скинути</button>
+          <span id="kasa-expense-total" style="font-size:12px;font-weight:700;color:#e05050;white-space:nowrap"></span>
+        </div>
+      </div>
       <div id="kasa-expense-list"></div>
     </div>
 
@@ -4365,6 +4381,17 @@ function renderKasa() {
   });
   expenseRows.sort((a, b) => b.date.localeCompare(a.date));
 
+  // Зберігаємо для фільтрації, будуємо список постачальників у селекті
+  state._expenseRows = expenseRows;
+  const supSet = new Set();
+  expenseRows.forEach(r => { if (r.cat === 'Постачальник' && r.desc) supSet.add(r.desc); });
+  const supSel = document.getElementById('kasa-filter-sup');
+  if (supSel) {
+    const prev = supSel.value;
+    supSel.innerHTML = '<option value="">Всі постачальники</option>' +
+      [...supSet].sort().map(s => '<option value="' + escapeHtml(s) + '"' + (prev===s?' selected':'') + '>' + escapeHtml(s) + '</option>').join('');
+  }
+
   // ---- KPI (всі часи для балансу) ----
   const totalIncome   = (state.repairs || []).reduce((s, j) => s + (j.payments || []).reduce((a, p) => a + (p.amount || 0), 0), 0);
   const totalSupPaid  = (state.supPayments || []).reduce((s, p) => s + (p.amount || 0), 0);
@@ -4394,17 +4421,8 @@ function renderKasa() {
       </div>`).join('')
     : '<div style="color:var(--text3);font-size:13px;padding:6px 0">Немає надходжень за цей період</div>';
 
-  // ---- Render expense list ----
-  const exEl = document.getElementById('kasa-expense-list');
-  exEl.innerHTML = expenseRows.length
-    ? expenseRows.map(r => `<div class="kasa-tx">
-        <span class="kasa-tx-date">${fmtDate(r.date)}</span>
-        <span class="kasa-tx-desc">${escapeHtml(r.desc)}</span>
-        <span class="kasa-tx-cat ${escapeHtml(r.catClass||'kcat-man')}">${escapeHtml(r.cat)}</span>
-        <span class="kasa-tx-amt" style="color:#e05050">−${Math.round(r.amount).toLocaleString()} грн</span>
-        ${r.id ? `<button class="kasa-tx-del" onclick="deleteCashWithdrawal('${escapeHtml(r.id)}')" title="Видалити">×</button>` : ''}
-      </div>`).join('')
-    : '<div style="color:var(--text3);font-size:13px;padding:6px 0">Немає витрат за цей період</div>';
+  // ---- Render expense list (через окрему функцію для фільтрів) ----
+  renderExpenseList();
 
   // ---- Ручні виводи всі часи (для довідки) ----
   const wlEl = document.getElementById('kasa-withdrawals-list');
@@ -4469,6 +4487,50 @@ async function deleteCashWithdrawal(id) {
   hideLoader();
 }
 
+// ============================================================
+// KASA — фільтрація витрат
+// ============================================================
+
+function renderExpenseList() {
+  const rows   = state._expenseRows || [];
+  const fType  = (document.getElementById('kasa-filter-type')?.value  || '').trim();
+  const fSup   = (document.getElementById('kasa-filter-sup')?.value   || '').trim();
+
+  const fmtDate = d => d ? new Date(d).toLocaleString('uk-UA', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+
+  const filtered = rows.filter(r => {
+    if (fType && r.cat !== fType) return false;
+    if (fSup  && r.desc !== fSup) return false;
+    return true;
+  });
+
+  const total = filtered.reduce((s, r) => s + r.amount, 0);
+  const totEl = document.getElementById('kasa-expense-total');
+  if (totEl) totEl.textContent = filtered.length < rows.length
+    ? 'Показано: −' + Math.round(total).toLocaleString() + ' грн (' + filtered.length + ' з ' + rows.length + ')'
+    : '';
+
+  const exEl = document.getElementById('kasa-expense-list');
+  if (!exEl) return;
+  exEl.innerHTML = filtered.length
+    ? filtered.map(r => '<div class="kasa-tx">' +
+        '<span class="kasa-tx-date">' + fmtDate(r.date) + '</span>' +
+        '<span class="kasa-tx-desc">' + escapeHtml(r.desc) + '</span>' +
+        '<span class="kasa-tx-cat ' + escapeHtml(r.catClass||'kcat-man') + '">' + escapeHtml(r.cat) + '</span>' +
+        '<span class="kasa-tx-amt" style="color:#e05050">−' + Math.round(r.amount).toLocaleString() + ' грн</span>' +
+        (r.id ? '<button class="kasa-tx-del" onclick="deleteCashWithdrawal(\'' + escapeHtml(r.id) + '\')" title="Видалити">×</button>' : '') +
+      '</div>').join('')
+    : '<div style="color:var(--text3);font-size:13px;padding:6px 0">Немає витрат за обраним фільтром</div>';
+}
+
+function clearExpenseFilters() {
+  const t = document.getElementById('kasa-filter-type');
+  const s = document.getElementById('kasa-filter-sup');
+  if (t) t.value = '';
+  if (s) s.value = '';
+  renderExpenseList();
+}
+
 // Автологін якщо є токен
 if (state.token) {
   initApp().catch(() => {
@@ -4478,6 +4540,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.08-62</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.08-63</div>
 </body>
 </html>
