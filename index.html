@@ -491,7 +491,23 @@ a{color:inherit;text-decoration:none}
   .pst-head span:nth-child(3),.pst-row span:nth-child(3){display:none}
 }
 
-/* ===================== WAREHOUSE ===================== */
+/* ===================== KASA ===================== */
+.kasa-withdraw-row{display:grid;grid-template-columns:170px 1fr 120px auto;gap:10px;align-items:end}
+@media(max-width:640px){.kasa-withdraw-row{grid-template-columns:1fr 1fr;}.kasa-withdraw-row button{grid-column:1/-1}}
+.kasa-tx{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.kasa-tx:last-child{border-bottom:none}
+.kasa-tx-date{font-size:11px;color:var(--text4);min-width:110px;flex-shrink:0}
+.kasa-tx-desc{flex:1;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kasa-tx-cat{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.kcat-in{background:rgba(39,196,122,.1);color:#27c47a;border:1px solid rgba(39,196,122,.2)}
+.kcat-sup{background:rgba(239,159,39,.1);color:#ef9f27;border:1px solid rgba(239,159,39,.2)}
+.kcat-sal{background:rgba(77,159,214,.1);color:#4d9fd6;border:1px solid rgba(77,159,214,.2)}
+.kcat-cod{background:rgba(192,80,192,.1);color:#c060c0;border:1px solid rgba(192,80,192,.2)}
+.kcat-man{background:rgba(200,0,0,.1);color:#e05050;border:1px solid rgba(200,0,0,.2)}
+.kasa-tx-amt{font-size:14px;font-weight:800;white-space:nowrap;min-width:100px;text-align:right;flex-shrink:0}
+.kasa-tx-del{background:none;border:none;color:var(--text4);cursor:pointer;font-size:16px;padding:0 4px;line-height:1;flex-shrink:0}
+.kasa-tx-del:hover{color:var(--red2)}
+
 .period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .period-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
 .period-row input{flex:1;min-width:110px}
@@ -610,6 +626,7 @@ a{color:inherit;text-decoration:none}
         <button class="nb hidden" onclick="showTab('stats',this)" id="tab-stats">Статистика</button>
         <button class="nb hidden" onclick="showTab('settings',this)" id="tab-settings">Налаштування</button>
         <button class="nb hidden" onclick="showTab('warehouse',this)" id="tab-warehouse">Склад</button>
+        <button class="nb hidden" onclick="showTab('kasa',this)" id="tab-kasa" style="color:var(--amber)">Каса</button>
       </div>
       <div class="topbar-right">
         <span class="user-badge" id="user-badge"></span>
@@ -623,6 +640,7 @@ a{color:inherit;text-decoration:none}
       <button class="nb hidden" onclick="showTab('stats',this)" id="tab-stats-m">Статистика</button>
       <button class="nb hidden" onclick="showTab('settings',this)" id="tab-settings-m">Налаштування</button>
       <button class="nb hidden" onclick="showTab('warehouse',this)" id="tab-warehouse-m">Склад</button>
+      <button class="nb hidden" onclick="showTab('kasa',this)" id="tab-kasa-m" style="color:var(--amber)">Каса</button>
     </div>
   </div>
 
@@ -691,18 +709,67 @@ a{color:inherit;text-decoration:none}
       <div class="stat-panel-title">Витрати запчастин за період</div>
       <div id="stat-parts"></div>
     </div>
-    <div class="stat-panel" style="margin-top:12px">
+    <!-- Ці блоки перенесено в КАСУ; порожні div збережено щоб renderStats() не падав -->
+    <div id="stat-sup-debts" style="display:none"></div>
+    <div id="stat-master-salaries" style="display:none"></div>
+    <div id="stat-coder-salaries" style="display:none"></div>
+  </div>
+
+  <!-- KASA TAB -->
+  <div class="main hidden" id="kasa-tab" style="display:none">
+
+    <!-- KPI -->
+    <div class="kpi-row" id="kasa-kpi-row"></div>
+
+    <!-- Фільтр дат -->
+    <div class="period-row" style="margin-bottom:16px">
+      <label>З</label>
+      <input type="date" id="kasa-from">
+      <label>По</label>
+      <input type="date" id="kasa-to">
+      <button class="btn-p sm" onclick="renderKasa()">Оновити</button>
+    </div>
+
+    <!-- Транзакції -->
+    <div class="stat-panel" style="margin-bottom:12px">
+      <div class="stat-panel-title" style="color:#27c47a">Надходження (оплати ремонтів)</div>
+      <div id="kasa-income-list"></div>
+    </div>
+    <div class="stat-panel" style="margin-bottom:12px">
+      <div class="stat-panel-title" style="color:#e05050">Витрати (постачальники + зарплати + ручні)</div>
+      <div id="kasa-expense-list"></div>
+    </div>
+
+    <!-- Ручний вивід -->
+    <div class="stat-panel" style="margin-bottom:12px;border-color:#2a1010">
+      <div class="stat-panel-title" style="color:#e05050">Ручний вивід коштів з каси</div>
+      <div class="kasa-withdraw-row">
+        <div class="fl"><label>Дата і час</label><input type="datetime-local" id="kasa-withdraw-date"></div>
+        <div class="fl"><label>Опис</label><input type="text" id="kasa-withdraw-desc" placeholder="Оренда, господарські витрати..."></div>
+        <div class="fl"><label>Сума (грн)</label><input type="number" id="kasa-withdraw-amount" placeholder="0" min="0"></div>
+        <button class="btn-p" style="align-self:end;background:#7a0000" onclick="saveCashWithdrawal()">− Вивести</button>
+      </div>
+      <div id="kasa-withdrawals-list" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Борги перед постачальниками (перенесено з статистики) -->
+    <div class="stat-panel" style="margin-bottom:12px">
       <div class="stat-panel-title" style="color:#e05050">Борги перед постачальниками</div>
-      <div id="stat-sup-debts"></div>
+      <div id="kasa-sup-debts"></div>
     </div>
-    <div class="stat-panel" style="margin-top:12px">
+
+    <!-- Зарплати майстрів (перенесено з статистики) -->
+    <div class="stat-panel" style="margin-bottom:12px">
       <div class="stat-panel-title" style="color:#EF9F27">Зарплати майстрів (за період)</div>
-      <div id="stat-master-salaries"></div>
+      <div id="kasa-master-salaries"></div>
     </div>
-    <div class="stat-panel" style="margin-top:12px">
+
+    <!-- Кодувальники (перенесено з статистики) -->
+    <div class="stat-panel" style="margin-bottom:12px">
       <div class="stat-panel-title" style="color:#d070d0">Виплати кодувальникам (за період)</div>
-      <div id="stat-coder-salaries"></div>
+      <div id="kasa-coder-salaries"></div>
     </div>
+
   </div>
 
   <!-- SETTINGS TAB -->
@@ -1091,7 +1158,7 @@ a{color:inherit;text-decoration:none}
 // ============================================================
 // CONFIG — замін на свій URL від Apps Script
 // ============================================================
-let API_URL = localStorage.getItem('bg_api_url') || 'https://script.google.com/macros/s/AKfycbz_lAMxg14GysIWyp6H-0ScooH2ypdpDWq1jXuDncKpvSnCl1Fn2jMyA7N_rHx9bIlw/exec';
+let API_URL = localStorage.getItem('bg_api_url') || 'https://script.google.com/macros/s/AKfycbypK5oWO6J2aCgrAMt8_RcWDPmQ7K6NAaiPIAWfonbUTiFvJr_R4tQIujSToW0EN3z7/exec';
 
 // ============================================================
 // STATE
@@ -1111,6 +1178,7 @@ let state = {
   supPayments:       [],
   salaryPayments:    [],
   coderPayments:     [],
+  cashFlow:          [],
   config:            {},
   filter: 'all',
   editId: null,
@@ -1236,6 +1304,7 @@ function applyData(data) {
   if (data.warehouseItems    != null) state.warehouseItems    = data.warehouseItems    || [];
   if (data.warehouseUsage    != null) state.warehouseUsage    = data.warehouseUsage    || [];
   if (data.warehousePayments != null) state.warehousePayments = data.warehousePayments || [];
+  if (data.cashFlow          != null) state.cashFlow          = data.cashFlow          || [];
   renderStockIndicators();
 }
 
@@ -1262,7 +1331,7 @@ async function initApp() {
   document.getElementById('user-badge').textContent = state.login + ' · ' + roleLabel(role);
 
   if (role === 'admin' || role === 'viewer') { showEl('tab-stats'); showEl('tab-stats-m'); }
-  if (role === 'admin') { showEl('tab-settings'); showEl('tab-settings-m'); showEl('btn-add-repair'); showEl('tab-warehouse'); showEl('tab-warehouse-m'); }
+  if (role === 'admin') { showEl('tab-settings'); showEl('tab-settings-m'); showEl('btn-add-repair'); showEl('tab-warehouse'); showEl('tab-warehouse-m'); showEl('tab-kasa'); showEl('tab-kasa-m'); }
   if (role === 'master' || role === 'coder') showEl('btn-add-repair');
 
   document.querySelectorAll('.admin-only').forEach(el => {
@@ -1275,6 +1344,7 @@ async function initApp() {
     renderRepairs();
     initStatDates();
     initWarehouseDates();
+    initKasaDates();
     // Фонове оновлення без лоадера
     api({ action: 'initData' }).then(res => {
       if (res && res.ok) { applyData(res); saveCache(res); renderRepairs(); }
@@ -1289,6 +1359,7 @@ async function initApp() {
     renderRepairs();
     initStatDates();
     initWarehouseDates();
+    initKasaDates();
   }
 }
 
@@ -1301,12 +1372,18 @@ function roleLabel(r) {
 // ============================================================
 function showTab(name, el) {
   if (name === 'warehouse') { renderWarehouse(); }
+  if (name === 'kasa')      { renderKasa(); }
   // Синхронізуємо обидві навігації (desktop + mobile)
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   // Активуємо відповідні кнопки в обох рядках
-  const ids = { repairs: ['tab-repairs','tab-repairs-m'], stats: ['tab-stats','tab-stats-m'], settings: ['tab-settings','tab-settings-m'] };
+  const ids = {
+    repairs:  ['tab-repairs','tab-repairs-m'],
+    stats:    ['tab-stats','tab-stats-m'],
+    settings: ['tab-settings','tab-settings-m'],
+    kasa:     ['tab-kasa','tab-kasa-m'],
+  };
   (ids[name] || []).forEach(id => { const b = document.getElementById(id); if(b) b.classList.add('active'); });
-  ['repairs','stats','settings','warehouse'].forEach(t => {
+  ['repairs','stats','settings','warehouse','kasa'].forEach(t => {
     const el = document.getElementById(t + '-tab');
     if (el) el.style.display = (t === name) ? '' : 'none';
   });
@@ -2726,9 +2803,8 @@ function renderStats() {
       <span style="text-align:right;color:var(--green2)">${Math.round(p.sale).toLocaleString()} грн</span>
     </div>`).join('') : '<div style="color:var(--text3);font-size:13px">Немає даних за цей період</div>';
 
-  renderSupplierDebts();
-  renderMasterSalaries(from, to);
-  renderCoderSalaries(from, to);
+  // Борги постачальників, зарплати та кодувальники — рендеряться в КАСІ
+  // renderSupplierDebts(); renderMasterSalaries(from,to); renderCoderSalaries(from,to);
 }
 
 function renderRepairAnalysis() {
@@ -2813,10 +2889,10 @@ function toggleMasterStats() {
 }
 
 function renderSupplierDebts() {
-  const el = document.getElementById('stat-sup-debts');
+  const el = document.getElementById('kasa-sup-debts');
   if (!el) return;
-  const from = document.getElementById('stat-from')?.value || '';
-  const to   = document.getElementById('stat-to')?.value   || '';
+  const from = document.getElementById('kasa-from')?.value || '';
+  const to   = document.getElementById('kasa-to')?.value   || '';
 
   const debtMap = {};
   state.repairs.forEach(j => {
@@ -2881,7 +2957,7 @@ function renderSupplierDebts() {
 }
 
 function renderMasterSalaries(from, to) {
-  const el = document.getElementById('stat-master-salaries');
+  const el = document.getElementById('kasa-master-salaries');
   if (!el) return;
   const done = state.repairs.filter(j =>
     j.status === 'done' && (
@@ -3224,9 +3300,7 @@ async function addSalaryPayment(master) {
   if (res.ok) {
     if (inp) inp.value = '';
     await reloadData();
-    const from = document.getElementById('stat-from').value;
-    const to   = document.getElementById('stat-to').value;
-    renderMasterSalaries(from, to);
+    renderKasaSalaries();
     toast('Виплачено ' + Math.round(amount).toLocaleString() + ' грн → ' + master, 'success');
   } else toast(res.error || 'Помилка', 'error');
   hideLoader();
@@ -3238,7 +3312,7 @@ async function addSalaryPayment(master) {
 // ============================================================
 
 function renderCoderSalaries(from, to) {
-  const el = document.getElementById('stat-coder-salaries');
+  const el = document.getElementById('kasa-coder-salaries');
   if (!el) return;
   const done = state.repairs.filter(j =>
     j.status === 'done' && j.coder && (
@@ -3308,9 +3382,7 @@ async function addCoderPayment(coder) {
   if (res.ok) {
     if (inp) inp.value = '';
     await reloadData();
-    const from = document.getElementById('stat-from').value;
-    const to   = document.getElementById('stat-to').value;
-    renderCoderSalaries(from, to);
+    renderKasaCoders();
     toast('Виплачено ' + Math.round(amount).toLocaleString() + ' грн → ' + coder, 'success');
   } else toast(res.error || 'Помилка', 'error');
   hideLoader();
@@ -4216,6 +4288,187 @@ function toast(msg, type = 'success') {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 
+// ============================================================
+// KASA
+// ============================================================
+
+function initKasaDates() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  document.getElementById('kasa-from').value = `${y}-${m}-01`;
+  document.getElementById('kasa-to').value   = now.toISOString().split('T')[0];
+  // дефолтний час для виводу — зараз
+  const dt = document.getElementById('kasa-withdraw-date');
+  if (dt) {
+    const pad = n => String(n).padStart(2,'0');
+    dt.value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  }
+}
+
+function kasaDateRange() {
+  return {
+    from: document.getElementById('kasa-from')?.value || '',
+    to:   document.getElementById('kasa-to')?.value   || '',
+  };
+}
+
+function renderKasa() {
+  const { from, to } = kasaDateRange();
+
+  // ---- Надходження: оплати ремонтів за період ----
+  const incomeRows = [];
+  (state.repairs || []).forEach(j => {
+    (j.payments || []).forEach(p => {
+      const d = (p.date || '').slice(0, 10);
+      if ((!from || d >= from) && (!to || d <= to)) {
+        incomeRows.push({
+          date:   p.date || '',
+          desc:   (j.car || '—') + (j.client ? ' — ' + j.client : ''),
+          cat:    'Оплата',
+          amount: p.amount || 0,
+          sign:   1,
+        });
+      }
+    });
+  });
+  incomeRows.sort((a, b) => b.date.localeCompare(a.date));
+
+  // ---- Витрати: постачальники ----
+  const expenseRows = [];
+  (state.supPayments || []).forEach(p => {
+    const d = (p.date || '').slice(0, 10);
+    if ((!from || d >= from) && (!to || d <= to)) {
+      expenseRows.push({ date: p.date || '', desc: p.supplier + (p.note ? ' · ' + p.note : ''), cat: 'Постачальник', catClass: 'kcat-sup', amount: p.amount || 0 });
+    }
+  });
+  // ---- Витрати: зарплати майстрів ----
+  (state.salaryPayments || []).forEach(p => {
+    const d = (p.date || '').slice(0, 10);
+    if ((!from || d >= from) && (!to || d <= to)) {
+      expenseRows.push({ date: p.date || '', desc: 'Майстер ' + p.master, cat: 'Зарплата', catClass: 'kcat-sal', amount: p.amount || 0 });
+    }
+  });
+  // ---- Витрати: виплати кодувальникам ----
+  (state.coderPayments || []).forEach(p => {
+    const d = (p.date || '').slice(0, 10);
+    if ((!from || d >= from) && (!to || d <= to)) {
+      expenseRows.push({ date: p.date || '', desc: 'Кодувальник ' + p.coder, cat: 'Кодувальник', catClass: 'kcat-cod', amount: p.amount || 0 });
+    }
+  });
+  // ---- Витрати: ручні ----
+  (state.cashFlow || []).forEach(p => {
+    const d = (p.date || '').slice(0, 10);
+    if ((!from || d >= from) && (!to || d <= to)) {
+      expenseRows.push({ date: p.date || '', desc: p.desc || '—', cat: 'Ручний вивід', catClass: 'kcat-man', amount: p.amount || 0, id: p.id });
+    }
+  });
+  expenseRows.sort((a, b) => b.date.localeCompare(a.date));
+
+  // ---- KPI (всі часи для балансу) ----
+  const totalIncome   = (state.repairs || []).reduce((s, j) => s + (j.payments || []).reduce((a, p) => a + (p.amount || 0), 0), 0);
+  const totalSupPaid  = (state.supPayments || []).reduce((s, p) => s + (p.amount || 0), 0);
+  const totalSalPaid  = (state.salaryPayments || []).reduce((s, p) => s + (p.amount || 0), 0);
+  const totalCodPaid  = (state.coderPayments || []).reduce((s, p) => s + (p.amount || 0), 0);
+  const totalManual   = (state.cashFlow || []).reduce((s, p) => s + (p.amount || 0), 0);
+  const totalExpense  = totalSupPaid + totalSalPaid + totalCodPaid + totalManual;
+  const balance       = totalIncome - totalExpense;
+
+  const periodIncome  = incomeRows.reduce((s, r) => s + r.amount, 0);
+  const periodExpense = expenseRows.reduce((s, r) => s + r.amount, 0);
+
+  document.getElementById('kasa-kpi-row').innerHTML = `
+    <div class="kpi amber"><div class="kpi-label">Баланс каси</div><div class="kpi-val amber">${Math.round(balance).toLocaleString()}</div><div class="kpi-sub">поточний залишок (всі часи)</div></div>
+    <div class="kpi green"><div class="kpi-label">Надходження (період)</div><div class="kpi-val green">+${Math.round(periodIncome).toLocaleString()}</div><div class="kpi-sub">оплати ремонтів</div></div>
+    <div class="kpi red"><div class="kpi-label">Витрати (період)</div><div class="kpi-val red">−${Math.round(periodExpense).toLocaleString()}</div><div class="kpi-sub">постач. + зарплати + ручні</div></div>`;
+
+  // ---- Render income list ----
+  const fmtDate = d => d ? new Date(d).toLocaleString('uk-UA', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+  const inEl = document.getElementById('kasa-income-list');
+  inEl.innerHTML = incomeRows.length
+    ? incomeRows.map(r => `<div class="kasa-tx">
+        <span class="kasa-tx-date">${fmtDate(r.date)}</span>
+        <span class="kasa-tx-desc">${escapeHtml(r.desc)}</span>
+        <span class="kasa-tx-cat kcat-in">${escapeHtml(r.cat)}</span>
+        <span class="kasa-tx-amt" style="color:#27c47a">+${Math.round(r.amount).toLocaleString()} грн</span>
+      </div>`).join('')
+    : '<div style="color:var(--text3);font-size:13px;padding:6px 0">Немає надходжень за цей період</div>';
+
+  // ---- Render expense list ----
+  const exEl = document.getElementById('kasa-expense-list');
+  exEl.innerHTML = expenseRows.length
+    ? expenseRows.map(r => `<div class="kasa-tx">
+        <span class="kasa-tx-date">${fmtDate(r.date)}</span>
+        <span class="kasa-tx-desc">${escapeHtml(r.desc)}</span>
+        <span class="kasa-tx-cat ${escapeHtml(r.catClass||'kcat-man')}">${escapeHtml(r.cat)}</span>
+        <span class="kasa-tx-amt" style="color:#e05050">−${Math.round(r.amount).toLocaleString()} грн</span>
+        ${r.id ? `<button class="kasa-tx-del" onclick="deleteCashWithdrawal('${escapeHtml(r.id)}')" title="Видалити">×</button>` : ''}
+      </div>`).join('')
+    : '<div style="color:var(--text3);font-size:13px;padding:6px 0">Немає витрат за цей період</div>';
+
+  // ---- Ручні виводи всі часи (для довідки) ----
+  const wlEl = document.getElementById('kasa-withdrawals-list');
+  const allManual = [...(state.cashFlow||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  wlEl.innerHTML = allManual.length
+    ? '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);margin-bottom:6px">Всі ручні виводи:</div>' +
+      allManual.map(p => `<div class="kasa-tx">
+        <span class="kasa-tx-date">${fmtDate(p.date)}</span>
+        <span class="kasa-tx-desc">${escapeHtml(p.desc||'—')}</span>
+        <span class="kasa-tx-cat kcat-man">Ручний вивід</span>
+        <span class="kasa-tx-amt" style="color:#e05050">−${Math.round(p.amount).toLocaleString()} грн</span>
+        <button class="kasa-tx-del" onclick="deleteCashWithdrawal('${escapeHtml(p.id)}')" title="Видалити">×</button>
+      </div>`).join('')
+    : '<div style="color:var(--text3);font-size:13px">Ручних виводів немає</div>';
+
+  // ---- Три перенесені блоки ----
+  renderSupplierDebts();
+  renderKasaSalaries();
+  renderKasaCoders();
+}
+
+function renderKasaSalaries() {
+  const { from, to } = kasaDateRange();
+  renderMasterSalaries(from, to);
+}
+
+function renderKasaCoders() {
+  const { from, to } = kasaDateRange();
+  renderCoderSalaries(from, to);
+}
+
+async function saveCashWithdrawal() {
+  const dt     = document.getElementById('kasa-withdraw-date').value;
+  const desc   = document.getElementById('kasa-withdraw-desc').value.trim();
+  const amount = parseFloat(document.getElementById('kasa-withdraw-amount').value) || 0;
+  if (!amount)  { toast('Введіть суму', 'error'); return; }
+  if (!desc)    { toast('Введіть опис', 'error'); return; }
+  if (!dt)      { toast('Вкажіть дату', 'error'); return; }
+  showLoader();
+  const res = await api({ action: 'saveCashFlow', item: {
+    id: String(Date.now()), date: new Date(dt).toISOString(), desc, amount: Math.round(amount)
+  }});
+  if (res.ok) {
+    document.getElementById('kasa-withdraw-amount').value = '';
+    document.getElementById('kasa-withdraw-desc').value   = '';
+    await reloadData();
+    renderKasa();
+    toast('Вивід збережено: −' + Math.round(amount).toLocaleString() + ' грн', 'success');
+  } else toast(res.error || 'Помилка', 'error');
+  hideLoader();
+}
+
+async function deleteCashWithdrawal(id) {
+  if (!confirm('Видалити цей вивід?')) return;
+  showLoader();
+  const res = await api({ action: 'deleteCashFlow', id });
+  if (res.ok) {
+    await reloadData();
+    renderKasa();
+    toast('Вивід видалено', 'success');
+  } else toast(res.error || 'Помилка', 'error');
+  hideLoader();
+}
+
 // Автологін якщо є токен
 if (state.token) {
   initApp().catch(() => {
@@ -4225,6 +4478,6 @@ if (state.token) {
   });
 }
 </script>
-<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.04-60</div>
+<div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#333;font-family:monospace;z-index:9999;pointer-events:none">v24.06.08-62</div>
 </body>
 </html>
